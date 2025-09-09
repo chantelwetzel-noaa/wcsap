@@ -5,10 +5,6 @@
 .Rhistory
 === 
 data-raw/
-data-processed/
-proposal/
-archive/
-presentations/
 
 _main*
 *.aux
