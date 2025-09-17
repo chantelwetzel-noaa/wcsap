@@ -1,5 +1,5 @@
 #' Combine management group to tables based on species names
-#' 
+#'
 #' Function to join the given table with the table that has the species management
 #' groups. Replaces underscores in column names with spaces.
 #'
@@ -9,10 +9,11 @@
 #' @author Chantel Wetzel
 #' @export
 format_table <- function(
-  x, 
-  man_groups) {
+  x,
+  man_groups
+) {
   cap_man <- format_species_names(x = man_groups)
   joined_df <- dplyr::left_join(x, cap_man, by = "Species") |>
-    dplyr::rename_with(~gsub("_", " ", .x))
+    dplyr::rename_with(~ gsub("_", " ", .x))
   return(joined_df)
 }
