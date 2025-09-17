@@ -13,7 +13,7 @@
 #'
 #' @param abundance R data object that contains the estimated abundance by species.
 #'   This function takes the existing values and adds the estimated abundance from
-#'   new assessments. The csv file to be read is found in the data-processessed folder
+#'   new assessments. The csv file to be read is found in the data-processed folder
 #'   called abundance_processed.csv
 #' @param species R data object that contains a list of species names to calculate
 #'   assessment prioritization.  The csv file with the list of species names should be 
