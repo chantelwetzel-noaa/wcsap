@@ -1,5 +1,5 @@
 ---
-title: "Data and process to conduct assessment prioritization for West Coast groundfish"
+title: "Stock assessment prioritization for West Coast groundfish"
 author: "Chantel Wetzel"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -18,11 +18,114 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
+This document describes the process of calculating Stock Assessment Prioritization for West Coast groundfish.  Information is provided below on the package structure, data used, and the code used to calculate ranking across the factors.
 
-## Functions
+## Package structure
 
-A list of all functions in the packages can be viewed by:
+This repository is structured like an R package to ease the installation
+process and increase the ability to easily test code:
 
-```r
-ls("package:assessment_prioritization")
+
+``` bash
+└───_targets
+├───data-processed
+│   └───2022 
+│   └───2024 
+├───data-raw (git ignored)
+│   └───2022 
+│   └───2024
+├───doc
+│   └───figures
+│   └───tables
+├───man
+├───model_files
+├───presentations
+├───R
+└───vignettes
 ```
+
+Additionally, this project uses [`targets`](https://books.ropensci.org/targets/), a pipeline tool, to identify objects that are current and out-of-date. The `_targets.R` script in the base package folder also provides clear linkage between loaded data, data filtering, and processing.
+
+### _targets
+
+Data tracking objects created by the `_targets.R` script are stored here.  Since confidential data are included in the data objects created by `targets`, this folder should not be pushed to Github. The `targets` data objects are used to track which items in the `_targets.R` script are out of date, allowing for non-dependent data objects to not be reprocessed to updated the whole pipeline.
+
+### data-processed
+
+The output from each of `summarize...()` function is save in the folder.  After stock assessment prioritization concludes, these files should be archived in a year folder in this location (e.g., `data-processed/2026`).  These file are pushed to Github and no confidential information should be stored in this folder.
+
+### data-raw
+
+Raw data files used to calculate each of the stock assessment prioritization factors are stored here.  After stock assessment prioritization concludes, these files should be archived in a year folder in this location (e.g., `data-raw/2026`).  These file are NOT pushed to Github since some of the data files contain confidential information.
+
+### doc
+
+Files used to create the methodology document.  These files may be migrated to vignettes for each factor hosted on a Github published webpage (or on Posit Connect). 
+
+### man
+
+Function documentation files.
+
+### model_files
+
+Cleaned up SS3 model files for the most recent assessment for groundfish species.  Currently, not all groundfish model files are included here, but rather the  files from 2017 onward. Information included in the Report files are used to determine metric about the population that are used for the stock status and assessment frequency factors.
+
+### presentations
+
+### R
+
+All the functions used in calculating each factor, functions for data filtering and foramtting.  This folder should contain only `R` functions and each function should be properly documented.
+
+### vignettes
+
+Rmarkdown files used to create content on the webpage that provides information about the Stock Assessment Prioritization and the package.
+
+## Data files that are stored in the data-raw folder 
+
+A description of each of the data files needed for conducting Stock Assessment Prioritization is provided below.
+
+* SSC Recommendations: 
+  * The most recent assessment year and SSC recommendation is stored in assess_year_ssc_rec.csv in the data-raw folder.  This file should be updated by hand each year to update the assessment year and the SSC recommendation for the next assessment.
+  * This information is used by `summarize_new_information()` to determine the period of time to evaluate new survey data by species.
+  * This information is used by `summarize_revenue()` for both commercial and tribal fisheries and `summarize_rec_importance()` to calculate adjustment factors for scoring species that were assessed in the previous assessment cycle.
+
+* Previous harvest specifications: 
+  * Adopted harvest specifications are downloaded from [PacFIN APEX GMT015 report](https://reports.psmfc.org/pacfin/f?p=501:5301:2460998972960:::::).  The years selected to download should be the most recent five from the previous year (current year - 1). This information is used by summarize_fishing_mortality() to determine the recent average attainment compared to the adopted harvest specifications.  
+    * Unfortunately, there are typically a number of things that need to be corrected by hand in this file.  Rockfish species managed in a complex are listed without Rockfish in their species name (e.g., China, Vermillion, etc.). I tried grepping the file only using the first word in the species name but had issues identifying the correct values.  
+    * There are duplicate entries (e.g., S of 4010, S of 3427, 4010-3428) for multipel speciesthat need to be removed to ensure that the correct OFL and ACL values are found.  The species where this is an issue are: cowcod, shortspine thornyhead, longspine thornyhead, lingcod
+  *  This harvest specifications from recent years by species is used within the `summarize_fishing_mortality()` to score average attainment. 
+
+* Mortality: 
+  * Groundfish Expanded Multiyear Mortality (GEMM) data is used to determine mortality for each species.  These data should be downloaded using nwfscSurvey::pull_gemm(). 
+  * The average catch by species is used within `summarize_fishing_mortality()` and `summarize_rec_importance()` to compare against the average OFL and ACL.
+
+* Future harvest specifications: 
+  * Future harvest specifications are downloaded from [PacFIN APEX GMT008 report](https://reports.psmfc.org/pacfin/f?p=501:530:2460998972960:::::). There are often default and alternative harvest specifications available and the harvest specifications that are considered to be most likely adopted are used. This selection is subjective.
+  *  This proposed harvest specifications for the upcoming management cycle by species is used within the `summarize_const_demand()` to identify species that may pose future management constraint given recent average catches. 
+
+* Revenue: 
+  * Revenue information is downloaded from PacFIN using the QueryBuilder available on PacFIN online with a user account. The columns used are AGENCY_CODE, COUNCIL_CODE, PACFIN_GROUP_GEAR_CODE, PACFIN_SPECIES_COMMON_NAME, PACFIN_YEAR, AFI_EXVESSEL_REVENUE, FLEET_CODE, and NOMINAL_TO_ACTUAL_PACFIN_SPECIES_NAME.  **These data are confidential and should not be stored in a public Github repository.**
+  * PacFIN data for ex-vessel revenue by species used by `summarize_revenue()` for both commercial and tribal fisheries. This information is also used by `summarize_const_demand()` by gear type to identify potential within sector constraints.
+
+* Tribal Scores: 
+  * Tribal importance captures the value by species to Tribes based on both commercial sale and susbsistance and ceremonial uses.  This information has been provided from Tribal representatives (data-raw/tribal_score.csv). 
+
+* Recreational Scores: 
+  * Captures the importance for each species to state recreational fisheries.  This information has been provided by State representatives (data-raw/recr_importance.csv). 
+
+* Abundance Measures: 
+  * Abundance is calculated from the most recent assessment for each species. The abundance values from the previous stock assessment prioritization cycle is read in as the initial data and is updated and saved based upon the models in the `model_files` folder. The file from the previous cycle is found in the in data-processed/previous sap year/abundance_processed.csv and the updated file is saved in data-processed/current sap year/abundance_processed.csv.
+  * This information is used and modifed by `summarize_stock_status()`.
+
+* Survey Data:
+  * Data from the NWFSC West Coast Groundfish Bottom Trawl Survey (WCGBTS). These data should be pulled using `nwfscSurvey::pull_catch()` and `nwfscSurvey::pull_bio()`. 
+  * Data from the NWFS Hook-and-Line Survey.  These data are maintained by John Harms and an updated data file should be requested from him each cycle.
+  
+* Model Files:
+  * The most recent assessment model files from 2017 onward.  
+  * The `clean_model_files()` should be used to remove all unnecessary model files within each folder to reduce the number of files saved.
+  * The information in the model files will be used to calculate stock status and population metrics in `summarize_stock_status()`.
+
+## Workflow
+
+1. 
