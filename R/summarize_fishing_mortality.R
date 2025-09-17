@@ -1,18 +1,15 @@
 #' Comparison between recent average mortality, OFLs, and ACLs. 
 #' 
 #' The official recent average mortality should
-#' come from the GEMM rather than a pull from PacFIN. 
-#' The manage_file is a file containing management quantities
-#' provided in a special pull by Rob Ames from the GMT016 table.
-#' This special pull of all management quantities by species across years
-#' had some issues that had to be fixed by hand:
+#' come from the GEMM rather than PacFIN. 
+#' The harvest_spex has all management quantities by species across years but
+#' there are issues may need to be fixed by hand:
 #' 1) Many rockfish species were missing "Rockfish" in their names and
 #' I had to correct them by hand due to grep issues when only the first
 #' name were used (e.g., China changed to China Rockfish).
-#' 2) The file does not contain OFLs or ACLs for sablefish, longspine
-#' thornyhead, and shortspine thornyhead.
-#' 3) Quantities (OFLs,..) were duplicated for blue rockfish and rougheye/blackspotted
-#' rockfish and had to be corrected by hand.
+#' 2) The file may contain area-specific OFLs or ACLs for longspine
+#' thornyhead, and shortspine thornyhead and the non-coastwide rows need to be 
+#' deleted. 
 #' 
 #' 2023 Notes of GMT 015 correction
 #' 1) blue rockfish in Oregon - hand deleted the blue/deacon/black complex rows
