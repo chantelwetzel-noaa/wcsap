@@ -1,6 +1,6 @@
 Package: wcsap
 Type: Package
-Title: West Coast Groundfish Assessment Prioritization
+Title: West Coast Groundfish Stock Assessment Prioritization
 Version: 1.0
 Authors@R:
     c(person(given = c("Chantel", "R."),
@@ -42,3 +42,4 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+URL: https://chantelwetzel-noaa.github.io/wcsap/
