@@ -21,6 +21,7 @@ Imports:
     nmfspalette,
     nwfscSurvey,
     PNWColors,
+    r4ss,
     readr,
     rmarkdown,
     stats,
@@ -31,8 +32,9 @@ Imports:
 Depends:
     R (>= 4.0)
 Remotes:
-    github::chantelwetzel-noaa/data_dummary,
+    github::chantelwetzel-noaa/westcoastdata,
     github::pfmc-assessments/nwfscSurvey,
+    github::nmfs-ost/nmfspalette,
     github::r4ss/r4ss
 VignetteBuilder: 
     knitr
