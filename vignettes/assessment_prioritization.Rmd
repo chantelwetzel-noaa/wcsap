@@ -100,7 +100,7 @@ A description of each of the data files needed for conducting Stock Assessment P
   * The average catch by species is used within `summarize_fishing_mortality()` and `summarize_rec_importance()` to compare against the average OFL and ACL.
 
 * Future harvest specifications: 
-  * Future harvest specifications are downloaded from [PacFIN APEX GMT008 report](https://reports.psmfc.org/pacfin/f?p=501:530:2460998972960:::::). There are often default and alternative harvest specifications available and the harvest specifications that are considered to be most likely adopted are used. This selection is subjective.
+  * Future harvest specifications are downloaded from [PacFIN APEX GMT008 report](https://reports.psmfc.org/pacfin/f?p=501:530:2460998972960:::::). There are often default and alternative harvest specifications available and the harvest specifications that are considered to be most likely adopted are used. This selection is subjective. The draft harvest specifications need to be downloaded for each year separately and then combined into a single csv file.
   *  This proposed harvest specifications for the upcoming management cycle by species is used within the `summarize_const_demand()` to identify species that may pose future management constraint given recent average catches. 
 
 * Revenue: 

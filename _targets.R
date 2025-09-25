@@ -14,7 +14,7 @@ targets::tar_option_set(
     "nwfscSurvey",
     "r4ss",
     "readr",
-    "westcoastdatasummary"
+    "westcoastdata"
   )
 )
 
@@ -219,7 +219,7 @@ list(
     # Determine the new available survey data
     tar_target(
       new_survey_data,
-      westcoastdatasummary::summarize_survey_new_information(
+      westcoastdata::summarize_survey_new_information(
         dir = here::here("data-processed"),
         stock_year = last_assess_year,
         wcgbt = wcgbt_bio_cleaned,
