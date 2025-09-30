@@ -142,25 +142,24 @@ summarize_stock_status <- function(
       key <- c(key, grep(to_match, species[, sp], ignore.case = TRUE))
     }
     group <- which(new_results$Species == unique_species[b])
-    new_abundance[key, "Estimate"] <- new_results[group[1], "WeightedStatus"]
-    new_abundance[key, "Trend"] <- ifelse(
-      new_abundance[key, "Estimate"] >= new_abundance[key, "Target"],
-      0,
-      ifelse(
-        new_results[group[1], "WeightedStatus"] >
-          new_results[group[1], "WeightedStatus_5"],
-        1,
-        -1
+
+    new_abundance[key, ] <- new_abundance[key, ] |>
+      dplyr::mutate(
+        Estimate = new_results[group[1], "WeightedStatus"],
+        Trend = dplyr::case_when(
+          new_abundance[key, "Estimate"] >= new_abundance[key, "Target"] ~ 0,
+          new_results[group[1], "WeightedStatus"] >
+            new_results[group[1], "WeightedStatus_5"] ~
+            1,
+          .default = -1
+        ),
+        Recruit_Var = new_results[group[1], "Mean_SigmaR"],
+        Mean_Catch_Age = new_results[group[1], "WeightedMeanCatchAge"],
+        Mean_Max_Age = new_results[group[1], "MeanMaxAge"],
+        Last_Assess = new_results[group[1], "AssessYear"]
       )
-    )
-    new_abundance[key, "Recruit_Var"] <- new_results[group[1], "Mean_SigmaR"]
-    new_abundance[key, "Mean_Catch_Age"] <- new_results[
-      group[1],
-      "WeightedMeanCatchAge"
-    ]
-    new_abundance[key, "Mean_Max_Age"] <- new_results[group[1], "MeanMaxAge"]
-    new_abundance[key, "Last_Assess"] <- new_results[group[1], "AssessYear"]
   }
+
   # Combine with the SSC recommendation
   ssc <- utils::read.csv(here::here("data-raw", "assess_year_ssc_rec.csv")) |>
     dplyr::select(-Last_Assess)
@@ -170,76 +169,28 @@ summarize_stock_status <- function(
   )
 
   # Rank and score the stock status sheet, delete trend column, and remove NAs.
-  x <- new_abundance
-  x$Rank <- x$Factor_Score <- NA
-  for (sp in 1:length(x$Species)) {
-    if (!is.na(x$Estimate[sp])) {
-      x$Factor_Score[sp] <-
-        ifelse(
-          x$Estimate[sp] > 2.0 * x$Target[sp],
-          1,
-          ifelse(
-            x$Estimate[sp] <= 2.0 * x$Target[sp] &
-              x$Estimate[sp] > 1.5 * x$Target[sp],
-            2,
-            ifelse(
-              x$Estimate[sp] <= 1.5 * x$Target[sp] &
-                x$Estimate[sp] > 1.1 * x$Target[sp],
-              3,
-              ifelse(
-                x$Estimate[sp] <= 1.1 * x$Target[sp] &
-                  x$Estimate[sp] > 0.9 * x$Target[sp],
-                4,
-                ifelse(
-                  x$Estimate[sp] <= 0.9 * x$Target[sp] &
-                    x$Estimate[sp] > x$MSST[sp] &
-                    x$Trend[sp] %in% c(0, 1),
-                  5,
-                  ifelse(
-                    x$Estimate[sp] <= 0.9 * x$Target[sp] &
-                      x$Estimate[sp] > x$MSST[sp] &
-                      x$Trend[sp] == -1,
-                    7,
-                    ifelse(
-                      x$Estimate[sp] <= x$MSST[sp] & x$Trend[sp] == 1,
-                      8,
-                      ifelse(
-                        x$Estimate[sp] <= x$MSST[sp] & x$Trend[sp] == 0,
-                        9,
-                        ifelse(
-                          x$Estimate[sp] <= x$MSST[sp] & x$Trend[sp] == -1,
-                          10
-                        )
-                      )
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
-    } else {
-      x$Factor_Score[sp] <-
-        ifelse(
-          x$PSA[sp] < 1.8,
-          3,
-          ifelse(
-            x$PSA[sp] >= 1.8 & x$PSA[sp] < 2,
-            4,
-            ifelse(x$PSA[sp] >= 2.0, 6)
-          )
-        )
-    }
-  }
-  x <- x[order(x[, "Factor_Score"], decreasing = TRUE), ]
-  zz <- 1
-  for (i in 10:1) {
-    ties <- which(x$Factor_Score == i)
-    if (length(ties) > 0) {
-      x$Rank[ties] <- zz
-    }
-    zz <- zz + length(ties)
-  }
+  abundance_out <- new_abundance |>
+    dplyr::mutate(
+      Factor_Score = dplyr::case_when(
+        Estimate > 2 * Target ~ 1,
+        Estimate <= 2 * Target & Estimate > 1.5 * Target ~ 2,
+        Estimate <= 1.5 * Target & Estimate > 1.1 * Target ~ 3,
+        Estimate <= 1.1 * Target & Estimate > 0.9 * Target ~ 4,
+        Estimate <= 0.9 * Target & Estimate > MSST & Trend == 1 ~ 5,
+        Estimate <= 0.9 * Target & Estimate > MSST & Trend == 0 ~ 6,
+        Estimate <= 0.9 * Target & Estimate > MSST & Trend == -1 ~ 7,
+        Estimate <= MSST & Trend == 1 ~ 8,
+        Estimate <= MSST & Trend == 0 ~ 9,
+        Estimate <= MSST & Trend == -1 ~ 10,
+        is.na(Estimate) & PSA < 1.8 ~ 4,
+        is.na(Estimate) & PSA >= 1.8 & PSA < 2 ~ 6,
+        is.na(Estimate) & PSA >= 2.0 ~ 9
+      ),
+      #Factor_Score = round(10 * Factor_Score / max(Factor_Score), 1),
+      Rank = rank(-Factor_Score, ties.method = "min")
+    ) |>
+    dplyr::arrange(Species, .locale = "en")
+
   abundance_out$Fraction_Unfished <- abundance_out$Estimate
   stock_status <- abundance_out[, c(
     "Species",

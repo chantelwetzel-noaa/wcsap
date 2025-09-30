@@ -21,16 +21,19 @@
 #'   which will calculate the revenue for the commercial fishery.
 #' @param assess_year R data object with the assessment year by species from the
 #'   data-raw/assess_year_ssc_rec.csv.
+#' @param last_assess_year Numeric value for the most recent assessment year.
 #'
 #' @author Chantel Wetzel
 #' @export
 #'
 #'
 summarize_revenue <- function(
-    revenue,
-    species,
-    tribal_score = NULL,
-    assess_year) {
+  revenue,
+  species,
+  tribal_score = NULL,
+  assess_year,
+  last_assess_year = 2025
+) {
   data <- revenue
 
   revenue_df <- data.frame(
@@ -56,7 +59,11 @@ summarize_revenue <- function(
     for (a in 1:length(name_list)) {
       key <- c(
         key,
-        grep(species[sp, a], data$PACFIN_SPECIES_COMMON_NAME, ignore.case = TRUE)
+        grep(
+          species[sp, a],
+          data$PACFIN_SPECIES_COMMON_NAME,
+          ignore.case = TRUE
+        )
       )
 
       ss <- c(
@@ -71,7 +78,11 @@ summarize_revenue <- function(
 
     if (length(key) > 0) {
       sub_data <- data[key, ]
-      rev_tmp <- stats::aggregate(AFI_EXVESSEL_REVENUE ~ AGENCY_CODE, sub_data, function(x) sum(x) / denominator)
+      rev_tmp <- stats::aggregate(
+        AFI_EXVESSEL_REVENUE ~ AGENCY_CODE,
+        sub_data,
+        function(x) sum(x) / denominator
+      )
       revenue_df[sp, "Revenue"] <- sum(rev_tmp[, 2])
       if (is.na(revenue_df[sp, "Revenue"])) {
         revenue_df[sp, "Revenue"] <- 0
@@ -92,37 +103,53 @@ summarize_revenue <- function(
         revenue_df[sp, "WA_Revenue"] <- 0
       }
     } else {
-      revenue_df[sp, c("Revenue", "CA_Revenue", "OR_Revenue", "WA_Revenue")] <- 0
+      revenue_df[
+        sp,
+        c("Revenue", "CA_Revenue", "OR_Revenue", "WA_Revenue")
+      ] <- 0
     }
   }
   revenue_df[, "Factor_Score"] <- log(as.numeric(revenue_df[, "Revenue"]) + 1)
 
   # Reduce the Factor Score by -1 for species that were assessed last cycle
-  species_just_assessed <- assess_year[which(assess_year$Last_Assess == (as.numeric(format(Sys.Date(), "%Y")) - 1)), "Species"]
-  revenue_df[which(revenue_df$Species %in% species_just_assessed), "Assessed_Last_Cycle"] <- -2
-  revenue_df[which(revenue_df$Species %in% species_just_assessed), "Factor_Score"] <-
-    ifelse(revenue_df[which(revenue_df$Species %in% species_just_assessed), "Factor_Score"] + revenue_df[which(revenue_df$Species %in% species_just_assessed), "Assessed_Last_Cycle"] > 0,
-      revenue_df[which(revenue_df$Species %in% species_just_assessed), "Factor_Score"] + revenue_df[which(revenue_df$Species %in% species_just_assessed), "Assessed_Last_Cycle"], 0
-    )
+  revenue_df <- revenue_df |>
+    dplyr::mutate(
+      Assess_Last_Cycle = dplyr::case_when(
+        assess_year[, "Last_Assss"] == last_assess_year ~ -2,
+        .default = 0
+      ),
+      Factor_Score = log(Revenue + 1) + Assess_Last_Cycle,
+      Factor_Score = dplyr::case_when(
+        Factor_Score > 0 ~ Factor_Score,
+        .default = Factor_Score
+      ),
+      Factor_Score = dplyr::case_when(
+        !is.na(Tribal_Score) ~ Factor_Score + Tribal_Score,
+        .default = Factor_Score
+      ),
+      Factor_Score = 10 * Factor_Score / max(Factor_Score),
+      Rank = rank(Factor_Score, ties.method = "min")
+    ) |>
+    dplyr::arrange(Species, .locale = "en")
 
-  if (is.null(tribal_score)) {
-    revenue_df[, "Factor_Score"] <- 10 * revenue_df[, "Factor_Score"] / max(revenue_df[, "Factor_Score"])
-  } else {
-    revenue_df[, "Factor_Score"] <- revenue_df[, "Tribal_Score"] + revenue_df[, "Factor_Score"]
-    revenue_df[, "Factor_Score"] <- 10 * revenue_df[, "Factor_Score"] / max(revenue_df[, "Factor_Score"])
-  }
-
-  revenue_df <- revenue_df[order(revenue_df[, "Factor_Score"], decreasing = TRUE), ]
-  revenue_df$Rank <- 1:nrow(revenue_df)
-  revenue_df <- revenue_df[order(revenue_df[, "Species"], decreasing = FALSE), ]
-  revenue_df$Factor_Score <- round(revenue_df$Factor_Score, 2)
-  revenue_df[, c("Revenue", "CA_Revenue", "OR_Revenue", "WA_Revenue")] <- round(revenue_df[, c("Revenue", "CA_Revenue", "OR_Revenue", "WA_Revenue")], 1)
+  revenue_df[, c("Revenue", "CA_Revenue", "OR_Revenue", "WA_Revenue")] <- round(
+    revenue_df[, c("Revenue", "CA_Revenue", "OR_Revenue", "WA_Revenue")],
+    1
+  )
 
   if (!"TI" %in% unique(data$FLEET_CODE)) {
     revenue_df <- revenue_df[, !colnames(revenue_df) %in% c("Tribal_Score")]
-    utils::write.csv(revenue_df, "data-processed/2_commercial_revenue.csv", row.names = FALSE)
+    utils::write.csv(
+      revenue_df,
+      "data-processed/2_commercial_revenue.csv",
+      row.names = FALSE
+    )
   } else {
-    utils::write.csv(revenue_df, "data-processed/3_tribal_revenue.csv", row.names = FALSE)
+    utils::write.csv(
+      revenue_df,
+      "data-processed/3_tribal_revenue.csv",
+      row.names = FALSE
+    )
   }
   return(revenue_df)
 }

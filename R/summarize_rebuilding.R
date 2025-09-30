@@ -32,29 +32,23 @@ summarize_rebuilding <- function(
       ignore.case = TRUE
     )
     target <- overfished_data[a, "Ttarget"]
-    score_based_on_time <- ifelse(
-      target - assessment_year > 20,
-      4,
-      ifelse(
-        target - assessment_year <= 20 & target - assessment_year > 4,
-        6,
-        9
-      )
+    score_based_on_time <- dplyr::case_when(
+      target - assessment_year > 20 ~ 4,
+      target - assessment_year <= 20 & target - assessment_year > 4 ~ 6,
+      .default = 9
     )
 
-    score <- ifelse(stock_status[find, "Trend"] == -1, 10, score_based_on_time)
+    score <- dplyr::case_when(
+      stock_status[find, "Trend"] == -1 ~ 10,
+      .default = score_based_on_time
+    )
     overfished_df[find, "Factor_Score"] <- score
     overfished_df[find, "Rebuilding_Target_Year"] <- target
   }
-
-  x <- 1
-  for (i in sort(unique(overfished_df[, "Factor_Score"]), decreasing = TRUE)) {
-    ties <- which(overfished_df$Factor_Score == i)
-    if (length(ties) > 0) {
-      overfished_df$Rank[ties] <- x
-    }
-    x <- x + length(ties)
-  }
+  overfished_df <- overfished_df |>
+    dplyr::mutate(
+      Rank = rank(-Factor_Score, ties.method = "min")
+    )
   overfished_df <- replace(overfished_df, overfished_df == "", NA)
   formatted_overfished <- format_all(x = overfished_df)
   readr::write_csv(

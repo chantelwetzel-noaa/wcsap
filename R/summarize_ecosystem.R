@@ -11,47 +11,34 @@
 summarize_ecosystem <- function(
   ecosystem_data
 ) {
-  colnames(ecosystem_data)[1] <- "Species"
   # Top Down is the consumption values and bottom up is the consumer values
-  ecosystem_data$Factor_Score <- round(
-    10 *
-      (ecosystem_data$prop_consumption_scaled +
-        ecosystem_data$prop_consumer_bio_scaled) /
-      max(
-        (ecosystem_data$prop_consumption_scaled +
-          ecosystem_data$prop_consumer_bio_scaled)
+  modified_ecosystem <- ecosystem_data |>
+    dplyr::mutate(
+      Factor_Score = round(
+        10 *
+          (prop_consumption_scaled + prop_consumer_bio_scaled) /
+          max(prop_consumption_scaled + prop_consumer_bio_scaled),
+        2
       ),
-    2
-  )
+      Rank = rank(Factor_Score, ties.method = "min"),
+      prop_consumption_scaled = round(prop_consumption_scaled, 2),
+      prop_consumer_bio_scaled = round(prop_consumer_bio_scaled, 2)
+    ) |>
+    dplyr::rename(
+      Species = species,
+      Top_Down_Scaled = prop_consumption_scaled,
+      Bottom_Up_Scaled = prop_consumer_bio_scaled
+    ) |>
+    dplyr::select(
+      -functional_groups,
+      -prop_consumer_bio_raw,
+      -prop_consumption_raw
+    ) |>
+    dplyr::arrange(Species, .locale = "en") |>
+    dplyr::relocate(Rank, .after = Species) |>
+    dplyr::relocate(Factor_Score, .after = Rank)
 
-  ecosystem_data <- with(
-    ecosystem_data,
-    ecosystem_data[order(ecosystem_data[, "Factor_Score"], decreasing = TRUE), ]
-  )
-  ecosystem_data$Rank <- 1:nrow(ecosystem_data)
-  ecosystem_data <- with(
-    ecosystem_data,
-    ecosystem_data[order(ecosystem_data[, "Species"], decreasing = FALSE), ]
-  )
-  ecosystem_data <- ecosystem_data[, c(
-    "Species",
-    "Rank",
-    "Factor_Score",
-    "prop_consumption_scaled",
-    "prop_consumer_bio_scaled"
-  )]
-  colnames(ecosystem_data) <- c(
-    "Species",
-    "Rank",
-    "Factor_Score",
-    "Top_Down_Scaled",
-    "Bottom_Up_Scaled"
-  )
-  ecosystem_data[, c("Top_Down_Scaled", "Bottom_Up_Scaled")] <- round(
-    ecosystem_data[, c("Top_Down_Scaled", "Bottom_Up_Scaled")],
-    2
-  )
-  formatted_ecosystem <- format_all(x = ecosystem_data)
+  formatted_ecosystem <- format_all(x = modified_ecosystem)
   readr::write_csv(
     formatted_ecosystem,
     here::here("data-processed", "5_ecosystem.csv")

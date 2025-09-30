@@ -16,6 +16,7 @@
 #'   A CSV file with the state-specific species importance scores
 #' @param assess_year R data object with the assessment year by species from the
 #'   data-processed/assess_year_ssc_rec.csv.
+#' @param last_assess_year Numeric value for the most recent assessment year.
 #'
 #' @author Chantel Wetzel
 #' @export
@@ -34,12 +35,10 @@ summarize_rec_importance <- function(
   rec_catch,
   species,
   rec_importance,
-  assess_year
+  assess_year,
+  last_assess_year = 2025
 ) {
   data <- rec_catch
-  #data <- read.csv(paste0("data-raw/", file_name))
-  #species <-  read.csv(paste0("data/", species_file))
-  #rec_score <- read.csv(file.path("doc", "tables", "recr_importance.csv"))
   rec_score <- rec_importance
   rec_score[is.na(rec_score)] <- 0
 
@@ -99,20 +98,6 @@ summarize_rec_importance <- function(
           sum
         )[, 2]
     }
-
-    rec_importance_df[sp, "Catch_Coastwide"] <-
-      sum(
-        rec_importance_df[
-          sp,
-          c(
-            "California_Recreational",
-            "Oregon_Recreational",
-            "Washington_Recreational"
-          )
-        ],
-        na.rm = TRUE
-      )
-
     rec_importance_df[
       sp,
       c(
@@ -122,117 +107,53 @@ summarize_rec_importance <- function(
       )
     ] <-
       rec_score[ss[1], c("CA", "OR", "WA")]
-
-    rec_importance_df[
-      sp,
-      c("Pseudo_Revenue_CA", "Pseudo_Revenue_OR", "Pseudo_Revenue_WA")
-    ] <-
-      rec_score[ss[1], c("CA", "OR", "WA")] *
-      rec_importance_df[
-        sp,
-        c(c(
-          "California_Recreational",
-          "Oregon_Recreational",
-          "Washington_Recreational"
-        ))
-      ]
-
-    rec_importance_df[sp, "Pseudo_Revenue_Coastwide"] <-
-      sum(
-        rec_importance_df[
-          sp,
-          c("Pseudo_Revenue_CA", "Pseudo_Revenue_OR", "Pseudo_Revenue_WA")
-        ],
-        na.rm = TRUE
-      )
   }
 
-  rec_importance_df$Factor_Score <- log(
-    rec_importance_df$Pseudo_Revenue_Coastwide + 1
-  ) #* 10 /
-  #max(log(rec_importance_df$Pseudo_Revenue_Coastwide + 1))
-
-  species_just_assessed <- assess_year[
-    which(
-      assess_year$Last_Assess == (as.numeric(format(Sys.Date(), "%Y")) - 1)
-    ),
-    "Species"
-  ]
-  rec_importance_df[
-    which(rec_importance_df$Species %in% species_just_assessed),
-    "Assessed_Last_Cycle"
-  ] <- -2
-  rec_importance_df[
-    which(rec_importance_df$Species %in% species_just_assessed),
-    "Factor_Score"
-  ] <-
-    ifelse(
-      rec_importance_df[
-        which(rec_importance_df$Species %in% species_just_assessed),
-        "Factor_Score"
-      ] +
-        rec_importance_df[
-          which(rec_importance_df$Species %in% species_just_assessed),
-          "Assessed_Last_Cycle"
-        ] >
-        0,
-      rec_importance_df[
-        which(rec_importance_df$Species %in% species_just_assessed),
-        "Factor_Score"
-      ] +
-        rec_importance_df[
-          which(rec_importance_df$Species %in% species_just_assessed),
-          "Assessed_Last_Cycle"
-        ],
-      0
+  rec_importance_df <- rec_importance_df |>
+    dplyr::mutate(
+      Catch_Coastwide = California_Recreational +
+        Oregon_Recreational +
+        Washington_Recreational,
+      Pseudo_Revenue_CA = Species_Importance_CA * California_Recreational,
+      Pseudo_Revenue_OR = Species_Importance_OR * Oregon_Recreational,
+      Pseudo_Revenue_WA = Species_Importance_WA * Washington_Recreational,
+      Pseudo_Revenue_Coastwide = Pseudo_Revenue_CA +
+        Pseudo_Revenue_OR +
+        Pseudo_Revenue_WA,
+      Assessed_Last_Cycle = dplyr::case_when(
+        assess_year[, "Last_Assess"] == last_assess_year ~ -2,
+        .default = 0
+      ),
+      Factor_Score = log(Pseudo_Revenue_Coastwide + 1) + Assessed_Last_Cycle,
+      Factor_Score = dplyr::case_when(
+        Factor_Score > 0 ~ Factor_Score,
+        .defualt = 0
+      ),
+      Factor_Score = round(10 * Factor_Score / max(Factor_Score), 2),
+      Rank = rank(Factor_Score, ties.method = "min")
+    ) |>
+    dplyr::arrange(Species, .locale = "en") |>
+    dplyr::rename(
+      Catch_CA = California_Recreational,
+      Catch_OR = Oregon_Recreational,
+      Catch_WA = Washington_Recreational
     )
-  rec_importance_df[, "Factor_Score"] <- 10 *
-    rec_importance_df[, "Factor_Score"] /
-    max(rec_importance_df[, "Factor_Score"])
-
-  rec_importance_df <-
-    rec_importance_df[
-      order(rec_importance_df[, "Factor_Score"], decreasing = TRUE),
-    ]
-
-  rec_importance_df$Rank <- 1:nrow(rec_importance_df)
-  # Quick check to deal with 0 ties
-  ind <- which(rec_importance_df$Factor_Score == 0)
-  rec_importance_df$Rank[ind] = rec_importance_df$Rank[ind[1]]
-  rec_importance_df <- rec_importance_df[
-    order(rec_importance_df[, "Species"], decreasing = FALSE),
-  ]
-  colnames(rec_importance_df)[
-    colnames(rec_importance_df) %in%
-      c(
-        "California_Recreational",
-        "Oregon_Recreational",
-        "Washington_Recreational"
-      )
-  ] <-
-    c("Catch_CA", "Catch_OR", "Catch_WA")
 
   rec_importance_df[, c(
     "Catch_Coastwide",
     "Catch_CA",
     "Catch_OR",
-    "Catch_WA"
-  )] <- round(
-    rec_importance_df[, c(
-      "Catch_Coastwide",
-      "Catch_CA",
-      "Catch_OR",
-      "Catch_WA"
-    )],
-    1
-  )
-  rec_importance_df[, c(
+    "Catch_WA",
     "Pseudo_Revenue_Coastwide",
     "Pseudo_Revenue_CA",
     "Pseudo_Revenue_OR",
     "Pseudo_Revenue_WA"
   )] <- round(
     rec_importance_df[, c(
+      "Catch_Coastwide",
+      "Catch_CA",
+      "Catch_OR",
+      "Catch_WA",
       "Pseudo_Revenue_Coastwide",
       "Pseudo_Revenue_CA",
       "Pseudo_Revenue_OR",
@@ -240,15 +161,11 @@ summarize_rec_importance <- function(
     )],
     1
   )
-  rec_importance_df[, "Factor_Score"] <- round(
-    rec_importance_df[, "Factor_Score"],
-    2
-  )
-
+  formatted_rec_importance <- format_all(x = rec_importance_df)
   utils::write.csv(
-    rec_importance_df,
+    formatted_rec_importance,
     "data-processed/4_recreational_importance.csv",
     row.names = FALSE
   )
-  return(rec_importance_df)
+  return(formatted_rec_importance)
 }

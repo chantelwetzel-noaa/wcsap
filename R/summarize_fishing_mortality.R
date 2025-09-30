@@ -99,70 +99,27 @@ summarize_fishing_mortality <- function(
       mort_df$Average_ACL[sp] <- value[manage_quants[2]] /
         length(unique(temp_spex$SPEX_YEAR))
     }
-
-    mort_df$Average_OFL_Attainment[sp] <- mort_df$Average_Catches[sp] /
-      mort_df$Average_OFL[sp]
-
-    mort_df[sp, "Factor_Score"] <-
-      ifelse(
-        mort_df$Average_OFL_Attainment[sp] <= 0.10,
-        1,
-        ifelse(
-          mort_df$Average_OFL_Attainment[sp] > 0.10 &
-            mort_df$Average_OFL_Attainment[sp] <= 0.25,
-          2,
-          ifelse(
-            mort_df$Average_OFL_Attainment[sp] > 0.25 &
-              mort_df$Average_OFL_Attainment[sp] <= 0.50,
-            3,
-            ifelse(
-              mort_df$Average_OFL_Attainment[sp] > 0.50 &
-                mort_df$Average_OFL_Attainment[sp] <= 0.75,
-              5,
-              ifelse(
-                mort_df$Average_OFL_Attainment[sp] > 0.75 &
-                  mort_df$Average_OFL_Attainment[sp] <= 0.90,
-                7,
-                ifelse(
-                  mort_df$Average_OFL_Attainment[sp] > 0.90 &
-                    mort_df$Average_OFL_Attainment[sp] <= 1.00,
-                  8,
-                  ifelse(
-                    mort_df$Average_OFL_Attainment[sp] > 1.00 &
-                      mort_df$Average_OFL_Attainment[sp] <= 1.10,
-                    9,
-                    ifelse(mort_df$Average_OFL_Attainment[sp] > 1.10, 10)
-                  )
-                )
-              )
-            )
-          )
-        )
-      )
   }
 
-  mort_df$Average_ACL_Attainment <- (mort_df$Average_Catches /
-    mort_df$Average_ACL)
-
-  mort_df[, c("Average_Catches", "Average_OFL", "Average_ACL")] <-
-    round(mort_df[, c("Average_Catches", "Average_OFL", "Average_ACL")], 1)
-  mort_df[, c("Average_OFL_Attainment", "Average_ACL_Attainment")] <-
-    round(mort_df[, c("Average_OFL_Attainment", "Average_ACL_Attainment")], 2)
-
-  mort_df <- mort_df[order(mort_df[, "Factor_Score"], decreasing = TRUE), ]
-
-  mort_df <- calculate_ties(
-    data = mort_df,
-    column_name = "Factor_Score"
-  )
-  x <- 1
-  for (i in sort(unique(mort_df[, "Factor_Score"]), decreasing = TRUE)) {
-    ties <- which(mort_df$Factor_Score == i)
-    if (length(ties) > 0) {
-      mort_df$Rank[ties] <- x
-    }
-    x <- x + length(ties)
-  }
+  mort_df <- mort_df |>
+    dplyr::mutate(
+      Average_OFL_Attainment = round(Average_Catches / Average_OFL, 2),
+      Average_ACL_Attainment = round(Average_Catches / Average_ACL, 2),
+      Average_Catches = round(Average_Catches, 1),
+      Average_OFL = round(Average_OFL, 1),
+      Average_ACL = round(Average_ACL, 1),
+      Factor_Score = dplyr::case_when(
+        Average_OFL_Attainment <= 0.10 ~ 1,
+        Average_OFL_Attainment > 0.10 & Average_OFL_Attainment <= 0.25 ~ 2,
+        Average_OFL_Attainment > 0.25 & Average_OFL_Attainment <= 0.50 ~ 3,
+        Average_OFL_Attainment > 0.50 & Average_OFL_Attainment <= 0.75 ~ 5,
+        Average_OFL_Attainment > 0.75 & Average_OFL_Attainment <= 0.90 ~ 7,
+        Average_OFL_Attainment > 0.90 & Average_OFL_Attainment <= 1.0 ~ 8,
+        Average_OFL_Attainment > 1.00 & Average_OFL_Attainment <= 1.10 ~ 9,
+        Average_OFL_Attainment > 1.10 ~ 10
+      ),
+      Rank = rank(-Factor_Score, ties.method = "min")
+    )
 
   formatted_mort_df <- format_all(x = mort_df)
   fish_mort <- data.frame(
