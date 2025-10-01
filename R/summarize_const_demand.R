@@ -57,7 +57,7 @@ summarize_const_demand <- function(
     "Pseudo_Revenue_WA"
   )]
   colnames(rec_tmp)[2:5] <- c("CW", "C", "O", "W")
-  rec_score_df <- rec_importance_df <- rec_tmp #data[, -c(ncol(data)-1, ncol(data))]
+  rec_score_df <- rec_importance_df <- rec_tmp
 
   denominator <- 1000
   max_value <- 10
@@ -94,9 +94,11 @@ summarize_const_demand <- function(
       ]
     }
 
-    tmp <- aggregate(AFI_EXVESSEL_REVENUE ~ gear, sub_data, function(x) {
-      sum(x) / denominator
-    })
+    tmp <- stats::aggregate(
+      AFI_EXVESSEL_REVENUE ~ gear,
+      sub_data,
+      function(x) sum(x) / denominator
+    )
     for (gg in sort(unique(tmp$gear))) {
       data[sp, colnames(data) == gg] <- tmp[
         tmp$gear == gg,
@@ -193,7 +195,8 @@ summarize_const_demand <- function(
     Species = species[, 1],
     Average_Catches = fishing_mortality$Average_Catches,
     Projected_ACL_Attainment = NA,
-    Choke_Stock_Score = 0
+    Choke_Stock_Score = 0,
+    sum_future_acl = NA
   )
 
   for (sp in 1:nrow(species)) {
@@ -217,73 +220,38 @@ summarize_const_demand <- function(
     }
 
     ff <- unique(ff)
+    choke_df[, "sum_future_acl"] <- sum(future_spex[ff, "ACL"], na.rm = TRUE)
+  }
 
-    # Future Attainment
-    choke_df$Projected_ACL_Attainment[sp] <- choke_df$Average_Catches[sp] /
-      sum(future_spex[ff, "ACL"], na.rm = TRUE)
-
-    # Calculate the adjustment based on future spex limitations
-    choke_df[sp, "Choke_Stock_Score"] <-
-      ifelse(
-        choke_df$Projected_ACL_Attainment[sp] >= 1.25,
-        5,
-        ifelse(
-          choke_df$Projected_ACL_Attainment[sp] < 1.25 &
-            choke_df$Projected_ACL_Attainment[sp] >= 1,
+  const_importance <- choke_df |>
+    dplyr::mutate(
+      Projected_ACL_Attainment = Average_Catches / sum_future_acl,
+      Choke_Stock_Score = dplyr::case_when(
+        Projected_ACL_Attainment[sp] >= 1.25 ~ 5,
+        Projected_ACL_Attainment[sp] < 1.25 &
+          Projected_ACL_Attainment[sp] >= 1 ~
           4,
-          ifelse(
-            choke_df$Projected_ACL_Attainment[sp] < 1.0 &
-              choke_df$Projected_ACL_Attainment[sp] >= 0.90,
-            3,
-            ifelse(
-              choke_df$Projected_ACL_Attainment[sp] < 0.9 &
-                choke_df$Projected_ACL_Attainment[sp] >= 0.80,
-              2,
-              ifelse(
-                choke_df$Projected_ACL_Attainment[sp] < 0.8 &
-                  choke_df$Projected_ACL_Attainment[sp] >= 0.70,
-                1,
-                0
-              )
-            )
-          )
-        )
-      )
-  }
-
-  const_importance <- data.frame(
-    Species = species[, 1],
-    Rank = NA,
-    Factor_Score = choke_df$Choke_Stock_Score +
-      com_importance_df$Commercial_Importance_Modifier +
-      rec_importance_df$Recreational_Importance_Modifier,
-    Choke_Stock_Score = choke_df$Choke_Stock_Score,
-    Commerical_Importance_Score = com_importance_df$Commercial_Importance_Modifier,
-    Recreational_Importance_Score = rec_importance_df$Recreational_Importance_Modifier,
-    Projected_ACL_Attainment = round(choke_df$Projected_ACL_Attainment, 2)
-  )
-
-  const_importance <- const_importance[
-    order(const_importance[, "Factor_Score"], decreasing = TRUE),
-  ]
-
-  zz <- 1
-  max_range <- ifelse(
-    min(const_importance$Factor_Score) != 0,
-    max(const_importance$Factor_Score),
-    max(const_importance$Factor_Score) + 1
-  )
-  for (i in max_range:1) {
-    if (min(const_importance$Factor_Score) == 0) {
-      ties <- which(const_importance$Factor_Score == (i - 1))
-    } else {
-      ties <- which(const_importance$Factor_Score == i)
-    }
-    if (length(ties) > 0) {
-      const_importance$Rank[ties] <- zz
-    }
-    zz <- zz + length(ties)
-  }
+        Projected_ACL_Attainment[sp] < 1.0 &
+          Projected_ACL_Attainment[sp] >= 0.90 ~
+          3,
+        Projected_ACL_Attainment[sp] < 0.9 &
+          Projected_ACL_Attainment[sp] >= 0.80 ~
+          2,
+        Projected_ACL_Attainment[sp] < 0.8 &
+          Projected_ACL_Attainment[sp] >= 0.70 ~
+          1,
+        .default = 0
+      ),
+      Projected_ACL_Attainment = round(Projected_ACL_Attainment, 2),
+      Commercial_Importance_Modifier = com_importance_df$Commercial_Importance_Modifier,
+      Recreational_Importance_Modifier = rec_importance_df$Recreational_Importance_Modifier,
+      Factor_Score = Choke_Stock_Score +
+        Commercial_Importance_Modifier +
+        Recreation_Importance_Modifier,
+      Factor_Score = 10 * Factor_Score / max(Factor_Score),
+      Rank = rank(Factor_Score, ties.method = "min")
+    ) |>
+    dplyr::arrange(Species, .locale = "en")
 
   format_const_importance <- format_all(x = const_importance)
   readr::write_csv(

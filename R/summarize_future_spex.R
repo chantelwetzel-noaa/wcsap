@@ -47,7 +47,7 @@ summarize_future_spex <- function(
     OFL = NA,
     ACL = NA,
     ACL_Attain_Percent = NA,
-    Last_Assessed = NA
+    Last_Assessed = freq_data[, "Last_Assess"]
   )
 
   for (sp in 1:nrow(species)) {
@@ -70,93 +70,33 @@ summarize_future_spex <- function(
     mort_df[sp, "Average_Removals"] <- fmort_data[key[1], "Average_Removals"]
   }
 
-  mort_df[, "ACL_Attain_Percent"] <- mort_df[, "Average_Removals"] /
-    mort_df[, "ACL"]
-  mort_df[, "Last_Assessed"] <- freq_data[, "Last_Assess"]
+  mod_mort_df <- mort_df |>
+    dplyr::mutate(
+      ACL_Attain_Percent = Average_Removals / ACL,
+      Factor_Score = dplyr::case_when(
+        ACL_Attain_Percent <= 0.10 ~ 1,
+        ACL_Attain_Percent > 0.10 & ACL_Attain_Percent <= 0.25 ~ 2,
+        ACL_Attain_Percent > 0.25 & ACL_Attain_Percent <= 0.50 ~ 3,
+        ACL_Attain_Percent > 0.50 & ACL_Attain_Percent[sp] <= 0.75 ~ 5,
+        ACL_Attain_Percent > 0.75 & ACL_Attain_Percent[sp] <= 0.90 ~ 7,
+        ACL_Attain_Percent > 0.90 & ACL_Attain_Percent[sp] <= 1.00 ~ 8,
+        ACL_Attain_Percent > 1.00 & ACL_Attain_Percent[sp] <= 1.10 ~ 9,
+        ACL_Attain_Percent > 1.10 ~ 10
+      ),
+      Modifier = dplyr::case_when(
+        Factor_Score == 10 ~ 4,
+        Factor_Score == 9 ~ 3,
+        Factor_Score == 8 ~ 2,
+        Factor_Score == 7 ~ 1,
+        Factor_Score == 5 ~ 0,
+        Factor_Score %in% c(4, 3, 2) ~ -1,
+        .default = -2
+      ),
+      Rank = rank(Factor_Score, ties.method = "min")
+    ) |>
+    dplyr::arrange(Species, .locale = "en")
 
-  for (sp in 1:nrow(species)) {
-    score <-
-      ifelse(
-        mort_df$ACL_Attain_Percent[sp] <= 0.10,
-        1,
-        ifelse(
-          mort_df$ACL_Attain_Percent[sp] > 0.10 &
-            mort_df$ACL_Attain_Percent[sp] <= 0.25,
-          2,
-          ifelse(
-            mort_df$ACL_Attain_Percent[sp] > 0.25 &
-              mort_df$ACL_Attain_Percent[sp] <= 0.50,
-            3,
-            ifelse(
-              mort_df$ACL_Attain_Percent[sp] > 0.50 &
-                mort_df$ACL_Attain_Percent[sp] <= 0.75,
-              5,
-              ifelse(
-                mort_df$ACL_Attain_Percent[sp] > 0.75 &
-                  mort_df$ACL_Attain_Percent[sp] <= 0.90,
-                7,
-                ifelse(
-                  mort_df$ACL_Attain_Percent[sp] > 0.90 &
-                    mort_df$ACL_Attain_Percent[sp] <= 1.00,
-                  8,
-                  ifelse(
-                    mort_df$ACL_Attain_Percent[sp] > 1.00 &
-                      mort_df$ACL_Attain_Percent[sp] <= 1.10,
-                    9,
-                    ifelse(mort_df$ACL_Attain_Percent[sp] > 1.10, 10)
-                  )
-                )
-              )
-            )
-          )
-        )
-      )
-
-    mort_df$Factor_Score[sp] <- score
-  }
-
-  mort_df <-
-    mort_df[order(mort_df[, "Factor_Score"], decreasing = TRUE), ]
-
-  x <- 1
-  for (i in 10:1) {
-    ties <- which(mort_df$Factor_Score == i)
-    if (length(ties) > 0) {
-      mort_df$Rank[ties] <- x
-    }
-    x <- x + length(ties)
-  }
-
-  # Modifier scores ranging from +4 to -2 where highest attainment would equal 4
-  for (sp in 1:nrow(species)) {
-    mort_df[sp, "Modifier"] <-
-      ifelse(
-        mort_df$Factor_Score[sp] == 10,
-        4,
-        ifelse(
-          mort_df$Factor_Score[sp] == 9,
-          3,
-          ifelse(
-            mort_df$Factor_Score[sp] == 8,
-            2,
-            ifelse(
-              mort_df$Factor_Score[sp] == 7,
-              1,
-              ifelse(
-                mort_df$Factor_Score[sp] == 5,
-                0,
-                ifelse(
-                  mort_df$Factor_Score[sp] > 4 & mort_df$Factor_Score[sp] <= 2,
-                  -1,
-                  -2
-                )
-              )
-            )
-          )
-        )
-      )
-  }
-  formatted_mort_df <- format_all(x = mort_df)
+  formatted_mort_df <- format_all(x = mod_mort_df)
   readr::write_csv(
     formatted_mort_df,
     here::here("data-processed", "future_spex.csv")

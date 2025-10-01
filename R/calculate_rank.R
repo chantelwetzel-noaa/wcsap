@@ -56,85 +56,48 @@ calculate_rank <- function(
 
   overall_rank_rm_stock_status_rebuild <- overall_rank
 
-  overall_rank$Total_Score <- round(
-    fishing_mortality$Factor_Score *
-      0.08 +
-      commercial_importance$Factor_Score * 0.21 +
-      tribal_importance$Factor_Score * 0.05 +
-      recreational_importance$Factor_Score * 0.09 +
-      ecosystem$Factor_Score * 0.05 +
-      stock_status$Factor_Score * 0.08 +
-      assessment_frequency$Factor_Score * 0.18 +
-      constituent_demand$Factor_Score * 0.11 +
-      new_information$Factor_Score * 0.05 +
-      rebuilding$Factor_Score * 0.10,
-    2
-  )
-
-  overall_rank <- with(
-    overall_rank,
-    overall_rank[order(overall_rank[, "Total_Score"], decreasing = TRUE), ]
-  )
-  x <- 1
-  for (i in sort(unique(overall_rank[, "Total_Score"]), decreasing = TRUE)) {
-    ties <- which(overall_rank$Total_Score == i)
-    if (length(ties) > 0) {
-      overall_rank$Overall_Rank[ties] <- x
-    }
-    x <- x + length(ties)
-  }
-  overall_rank <- with(
-    overall_rank,
-    overall_rank[order(overall_rank[, "Species"], decreasing = FALSE), ]
-  )
+  overall_rank <- overall_rank |>
+    dplyr::mutate(
+      Total_Score = round(
+        fishing_mortality *
+          0.08 +
+          commercial_importance * 0.21 +
+          tribal_importance * 0.05 +
+          recreational_importance * 0.09 +
+          ecosystem * 0.05 +
+          stock_status * 0.08 +
+          assessment_frequency * 0.18 +
+          constituent_demand * 0.11 +
+          new_information * 0.05 +
+          rebuilding * 0.10,
+        2
+      ),
+      Rank = rank(Total_Score, ties.method = "min")
+    ) |>
+    dplyr::arrange(dplyr::desc(Total_Score)) |>
+    dplyr::arrange(Species, .locale = "en")
 
   # Calculate rank with stock status and rebuilding removed
-  overall_rank_rm_stock_status_rebuild$Total_Score <- round(
-    fishing_mortality$Factor_Score *
-      0.08 +
-      commercial_importance$Factor_Score * 0.21 +
-      tribal_importance$Factor_Score * 0.05 +
-      recreational_importance$Factor_Score * 0.09 +
-      ecosystem$Factor_Score * 0.05 +
-      stock_status$Factor_Score * 0.0 +
-      assessment_frequency$Factor_Score * 0.18 +
-      constituent_demand$Factor_Score * 0.11 +
-      new_information$Factor_Score * 0.05 +
-      rebuilding$Factor_Score * 0.0,
-    2
-  )
-
-  overall_rank_rm_stock_status_rebuild <-
-    with(
-      overall_rank_rm_stock_status_rebuild,
-      overall_rank_rm_stock_status_rebuild[
-        order(
-          overall_rank_rm_stock_status_rebuild[, "Total_Score"],
-          decreasing = TRUE
-        ),
-      ]
-    )
-  x <- 1
-  for (i in sort(
-    unique(overall_rank_rm_stock_status_rebuild[, "Total_Score"]),
-    decreasing = TRUE
-  )) {
-    ties <- which(overall_rank_rm_stock_status_rebuild$Total_Score == i)
-    if (length(ties) > 0) {
-      overall_rank_rm_stock_status_rebuild$Overall_Rank[ties] <- x
-    }
-    x <- x + length(ties)
-  }
-  overall_rank_rm_stock_status_rebuild <-
-    with(
-      overall_rank_rm_stock_status_rebuild,
-      overall_rank_rm_stock_status_rebuild[
-        order(
-          overall_rank_rm_stock_status_rebuild[, "Species"],
-          decreasing = FALSE
-        ),
-      ]
-    )
+  overall_rank_rm_stock_status_rebuild <- overall_rank_rm_stock_status_rebuild |>
+    dplyr::mutate(
+      Total_Score = round(
+        fishing_mortality *
+          0.08 +
+          commercial_importance * 0.21 +
+          tribal_importance * 0.05 +
+          recreational_importance * 0.09 +
+          ecosystem * 0.05 +
+          stock_status * 0.0 +
+          assessment_frequency * 0.18 +
+          constituent_demand * 0.11 +
+          new_information * 0.05 +
+          rebuilding * 0.0,
+        2
+      ),
+      Rank = rank(Total_Score, ties.method = "min")
+    ) |>
+    dplyr::arrange(dplyr::desc(Total_Score)) |>
+    dplyr::arrange(Species, .locale = "en")
 
   utils::write.csv(
     overall_rank,
