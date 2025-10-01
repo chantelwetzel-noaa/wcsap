@@ -3,8 +3,8 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   assessment_prioritization: assessment_prioritization.html
-  species data filtering: species data filtering.html
-last_built: 2025-10-01T15:09Z
+  species_data_filtering: species_data_filtering.html
+last_built: 2025-10-01T16:08Z
 urls:
   reference: https://chantelwetzel-noaa.github.io/wcsap/reference
   article: https://chantelwetzel-noaa.github.io/wcsap/articles
