@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_gemm.R
 \name{filter_gemm}
 \alias{filter_gemm}
-\title{Filter the GEMM data}
+\title{Filter the GEMM data for select sectors}
 \usage{
 filter_gemm(
   data,
@@ -15,7 +15,7 @@ filter_gemm(
 \item{sector}{List of sectors to retain}
 }
 \description{
-Filter the GEMM data
+Filter the GEMM data for select sectors
 }
 \author{
 Chantel Wetzel

@@ -4,7 +4,13 @@
 \alias{summarize_rec_importance}
 \title{Calculate recreational importance}
 \usage{
-summarize_rec_importance(rec_catch, species, rec_importance, assess_year)
+summarize_rec_importance(
+  rec_catch,
+  species,
+  rec_importance,
+  assess_year,
+  last_assess_year = 2025
+)
 }
 \arguments{
 \item{rec_catch}{R data object created by filter_gemm function with only recreational catches
@@ -19,6 +25,8 @@ A CSV file with the state-specific species importance scores}
 
 \item{assess_year}{R data object with the assessment year by species from the
 data-processed/assess_year_ssc_rec.csv.}
+
+\item{last_assess_year}{Numeric value for the most recent assessment year.}
 }
 \description{
 Summarize and format recreational catch data to be used along with recreational

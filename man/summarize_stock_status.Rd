@@ -9,7 +9,7 @@ summarize_stock_status(abundance, species, years, model_loc = "model_files")
 \arguments{
 \item{abundance}{R data object that contains the estimated abundance by species.
 This function takes the existing values and adds the estimated abundance from
-new assessments. The csv file to be read is found in the data-processessed folder
+new assessments. The csv file to be read is found in the data-processed folder
 called abundance_processed.csv}
 
 \item{species}{R data object that contains a list of species names to calculate
@@ -36,7 +36,7 @@ then saved to the tables folder.
 \examples{
 \dontrun{
   summarize_stock_status(
-  		abundance = abundance, 
+  		abundance = abundance,
   		species = species,
   		model_loc = "model_files",
   		years = 2000:2020 # Catch-at-Age range

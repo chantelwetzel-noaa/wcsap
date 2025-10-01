@@ -31,19 +31,16 @@ This allows to easily shift between the ABC and the ACL if needed.}
 }
 \description{
 The official recent average mortality should
-come from the GEMM rather than a pull from PacFIN.
-The manage_file is a file containing management quantities
-provided in a special pull by Rob Ames from the GMT016 table.
-This special pull of all management quantities by species across years
-had some issues that had to be fixed by hand:
+come from the GEMM rather than PacFIN.
+The harvest_spex has all management quantities by species across years but
+there are issues may need to be fixed by hand:
 \enumerate{
 \item Many rockfish species were missing "Rockfish" in their names and
 I had to correct them by hand due to grep issues when only the first
 name were used (e.g., China changed to China Rockfish).
-\item The file does not contain OFLs or ACLs for sablefish, longspine
-thornyhead, and shortspine thornyhead.
-\item Quantities (OFLs,..) were duplicated for blue rockfish and rougheye/blackspotted
-rockfish and had to be corrected by hand.
+\item The file may contain area-specific OFLs or ACLs for longspine
+thornyhead, and shortspine thornyhead and the non-coastwide rows need to be
+deleted.
 }
 }
 \details{

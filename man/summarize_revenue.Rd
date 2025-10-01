@@ -4,7 +4,13 @@
 \alias{summarize_revenue}
 \title{Calculate importance by revenue}
 \usage{
-summarize_revenue(revenue, species, tribal_score = NULL, assess_year)
+summarize_revenue(
+  revenue,
+  species,
+  tribal_score = NULL,
+  assess_year,
+  last_assess_year = 2025
+)
 }
 \arguments{
 \item{revenue}{R data object filtered by \code{\link[=filter_revenue]{filter_revenue()}} that contains ex-vessel
@@ -21,6 +27,8 @@ which will calculate the revenue for the commercial fishery.}
 
 \item{assess_year}{R data object with the assessment year by species from the
 data-raw/assess_year_ssc_rec.csv.}
+
+\item{last_assess_year}{Numeric value for the most recent assessment year.}
 }
 \description{
 Summarize and format commercial revenue data for insert
