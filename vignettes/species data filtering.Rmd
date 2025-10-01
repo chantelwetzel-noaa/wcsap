@@ -1,10 +1,10 @@
 ---
-title: "Filtering data for non-coastwide FMCspecies"
+title: "Filtering data for non-coastwide FMP species"
 author: "Chantel Wetzel"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{wcsap}
+  %\VignetteIndexEntry{Filtering data for non-coastwide FMP species}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

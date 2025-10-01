@@ -4,7 +4,7 @@ author: "Chantel Wetzel"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{wcsap}
+  %\VignetteIndexEntry{Stock assessment prioritization for West Coast groundfish}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
