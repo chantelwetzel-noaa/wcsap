@@ -2,7 +2,8 @@
 #'
 #'
 #' @param x A factor data frame that contains species names to be renamed.
-#' @param col_names The species column name within the factor data frame
+#' @param man_groups A data frame that contains the management group for
+#'   each species
 #' @returns The factor data frame with the species renamed
 #' @author Chantel Wetzel
 #' @export

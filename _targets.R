@@ -20,6 +20,9 @@ targets::tar_option_set(
 
 # Source all functions in the R folder
 targets::tar_source()
+targets::tar_source(
+  "C:/Users/chantel.wetzel/Documents/github/prioritization/data_summary/R/get_species_list.R"
+)
 
 # End this file with a list of target objects.
 list(
@@ -68,7 +71,7 @@ list(
     # downloaded from: https://reports.psmfc.org/pacfin/f?p=501:5301:2460998972960:::::
     targets::tar_target(
       harvest_spex_data,
-      readr::read_csv("data-raw/GMT015-final specifications-2020 - 2025.csv"),
+      readr::read_csv("data-raw/GMT015-final_specifications-2020-2025.csv"),
       format = "file"
     ),
     # Recent GEMM data:
@@ -80,7 +83,7 @@ list(
     # downloaded from https://reports.psmfc.org/pacfin/f?p=501:530:2460998972960:INITIAL::::
     targets::tar_target(
       future_spex_data,
-      readr::read_csv("data-raw/GMT008-harvest specifications_alt2-2025.csv"),
+      readr::read_csv("data-raw/GMT008-harvest_specifications_alt2-2025.csv"),
       format = "file"
     ),
     # Revenue information downloaded from PacFIN using QueryBuilder available online:
@@ -135,18 +138,22 @@ list(
     # Pull NWFSC WCGBTS data
     tar_target(
       wcgbt_data,
-      pull_wcgbts(
-        dir = here::here("data-raw"),
-        load = TRUE,
-        species = survey_species
-      )
+      load("data-raw/bio_pull_all_NWFSC.Combo_2025-09-12.rdata"),
     ),
+    #tar_target(
+    #  wcgbt_data,
+    #  westcoastdata::pull_wcgbts(
+    #    dir = here::here("data-raw"),
+    #    load = TRUE,
+    #    species = survey_species
+    #  )
+    #),
     # NWFSC HKL Survey Data
     tar_target(
       nwfsc_hkl_data,
       readr::read_csv(here::here(
         "data-raw",
-        "nwfsc_hkl_DWarehouse version_09032025.csv"
+        "nwfsc_hkl_DWarehouse_version_09032025.csv"
       ))
     )
   ),

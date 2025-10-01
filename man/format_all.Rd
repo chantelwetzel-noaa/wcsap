@@ -12,7 +12,8 @@ format_all(
 \arguments{
 \item{x}{A factor data frame that contains species names to be renamed.}
 
-\item{col_names}{The species column name within the factor data frame}
+\item{man_groups}{A data frame that contains the management group for
+each species}
 }
 \value{
 The factor data frame with the species renamed
