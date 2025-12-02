@@ -22,14 +22,14 @@ clean_model_files <- function(
   files_to_keep <- c(
     "CompReport.sso",
     "control.ss_new",
+    "covar.sso",
     "data_echo.ss_new",
     "forecast.ss",
-    "starter.ss",
     "Forecast-Report.sso",
     "Report.sso",
     "ss3.par",
     "ss.par",
-    "covar.sso",
+    "starter.ss",
     "wtatage.ss_new",
     "warning.sso"
   )
