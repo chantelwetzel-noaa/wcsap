@@ -51,11 +51,13 @@ summarize_revenue <- function(
   denominator <- 1000
   if (unique(data$FLEET_CODE)[1] == "TI") {
     denominator <- 1
+    revenue_df[, "Tribal_Score"] <- tribal_score[, "Score"]
   }
 
   for (sp in 1:nrow(species)) {
     key <- ss <- NULL
-    name_list <- species[sp, species[sp, ] != -99]
+    cols <- as.vector(species[sp, ] != -99)
+    name_list <- species[sp, cols]
     for (a in 1:length(name_list)) {
       key <- c(
         key,
@@ -65,15 +67,6 @@ summarize_revenue <- function(
           ignore.case = TRUE
         )
       )
-
-      ss <- c(
-        ss,
-        grep(species[sp, a], tribal_score$Species, ignore.case = TRUE)
-      )
-    }
-
-    if (!is.null(tribal_score)) {
-      revenue_df$Tribal_Score[sp] <- tribal_score[ss[1], "Score"]
     }
 
     if (length(key) > 0) {
@@ -110,12 +103,14 @@ summarize_revenue <- function(
     }
   }
   revenue_df[, "Factor_Score"] <- log(as.numeric(revenue_df[, "Revenue"]) + 1)
+  revenue_df <- as.data.frame(revenue_df)
 
   # Reduce the Factor Score by -1 for species that were assessed last cycle
   revenue_df <- revenue_df |>
+    dplyr::rename(Species = speciesName) |>
     dplyr::mutate(
       Assess_Last_Cycle = dplyr::case_when(
-        assess_year[, "Last_Assss"] == last_assess_year ~ -2,
+        assess_year[, "Last_Assess"] == last_assess_year ~ -2,
         .default = 0
       ),
       Factor_Score = log(Revenue + 1) + Assess_Last_Cycle,
@@ -138,7 +133,8 @@ summarize_revenue <- function(
   )
 
   if (!"TI" %in% unique(data$FLEET_CODE)) {
-    revenue_df <- revenue_df[, !colnames(revenue_df) %in% c("Tribal_Score")]
+    revenue_df <- revenue_df |>
+      dplyr::select(-Tribal_Score)
     utils::write.csv(
       revenue_df,
       "data-processed/2_commercial_revenue.csv",

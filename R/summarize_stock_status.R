@@ -137,26 +137,36 @@ summarize_stock_status <- function(
   new_abundance <- abundance
   for (b in 1:length(unique_species)) {
     to_match <- gsub("_", " ", unique_species[b])
-    key <- NULL
+    species_key <- new_abundance_key <- new_results_key <- NULL
     for (sp in 1:ncol(species)) {
-      key <- c(key, grep(to_match, species[, sp], ignore.case = TRUE))
+      species_key <- c(
+        species_key,
+        grep(to_match, as.matrix(species[, sp]), ignore.case = TRUE)
+      )
     }
-    group <- which(new_results$Species == unique_species[b])
+    new_results_key <- which(
+      gsub("_", " ", new_results$Species) %in% tolower(species[species_key, ])
+    )[1]
+    new_abundance_key <- which(
+      gsub("_", " ", new_abundance$Species) %in% tolower(species[species_key, ])
+    )
 
-    new_abundance[key, ] <- new_abundance[key, ] |>
+    new_abundance[new_abundance_key, ] <- new_abundance[new_abundance_key, ] |>
       dplyr::mutate(
-        Estimate = new_results[group[1], "WeightedStatus"],
+        Estimate = new_results[new_results_key, "WeightedStatus"],
         Trend = dplyr::case_when(
-          new_abundance[key, "Estimate"] >= new_abundance[key, "Target"] ~ 0,
-          new_results[group[1], "WeightedStatus"] >
-            new_results[group[1], "WeightedStatus_5"] ~
+          new_abundance[new_abundance_key, "Estimate"] >=
+            new_abundance[new_abundance_key, "Target"] ~
+            0,
+          new_results[new_results_key, "WeightedStatus"] >
+            new_results[new_results_key, "WeightedStatus_5"] ~
             1,
           .default = -1
         ),
-        Recruit_Var = new_results[group[1], "Mean_SigmaR"],
-        Mean_Catch_Age = new_results[group[1], "WeightedMeanCatchAge"],
-        Mean_Max_Age = new_results[group[1], "MeanMaxAge"],
-        Last_Assess = new_results[group[1], "AssessYear"]
+        Recruit_Var = new_results[new_results_key, "Mean_SigmaR"],
+        Mean_Catch_Age = new_results[new_results_key, "WeightedMeanCatchAge"],
+        Mean_Max_Age = new_results[new_results_key, "MeanMaxAge"],
+        Last_Assess = new_results[new_results_key, "AssessYear"]
       )
   }
 

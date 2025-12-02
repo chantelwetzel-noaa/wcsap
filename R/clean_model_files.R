@@ -28,6 +28,7 @@ clean_model_files <- function(
     "Forecast-Report.sso",
     "Report.sso",
     "ss3.par",
+    "ss.par",
     "covar.sso",
     "wtatage.ss_new",
     "warning.sso"

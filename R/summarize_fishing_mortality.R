@@ -59,13 +59,14 @@ summarize_fishing_mortality <- function(
 
   for (sp in 1:nrow(species)) {
     key <- ss <- ff <- NULL
-    name_list <- species[sp, species[sp, ] != -99]
+    cols <- as.vector(species[sp, ] != -99)
+    name_list <- species[sp, cols]
 
     for (a in 1:length(name_list)) {
       key <- c(key, grep(species[sp, a], data$species, ignore.case = TRUE))
       ss <- c(
         ss,
-        grep(species[sp, a], spex$STOCK_OR_COMPLEX, ignore.case = TRUE)
+        grep(name_list[a], spex$STOCK_OR_COMPLEX, ignore.case = TRUE)
       )
     }
     if (length(ss) == 0) {
@@ -102,6 +103,7 @@ summarize_fishing_mortality <- function(
   }
 
   mort_df <- mort_df |>
+    dplyr::rename(Species = speciesName) |>
     dplyr::mutate(
       Average_OFL_Attainment = round(Average_Catches / Average_OFL, 2),
       Average_ACL_Attainment = round(Average_Catches / Average_ACL, 2),
@@ -122,11 +124,8 @@ summarize_fishing_mortality <- function(
     )
 
   formatted_mort_df <- format_all(x = mort_df)
-  fish_mort <- data.frame(
-    Species = formatted_mort_df$Species,
-    Factor_Score = formatted_mort_df$Factor_Score,
-    Average_Catches = formatted_mort_df$Average_Catches
-  )
+  fish_mort <- formatted_mort_df |>
+    dplyr::select(Species, `Factor Score`, `Average Catches`)
   readr::write_csv(
     formatted_mort_df,
     here::here("data-processed", "1_fishing_mortality.csv")
