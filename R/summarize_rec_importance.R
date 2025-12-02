@@ -58,7 +58,8 @@ summarize_rec_importance <- function(
     California_Recreational = NA,
     Oregon_Recreational = NA,
     Washington_Recreational = NA
-  )
+  ) |>
+    dplyr::rename(Species = speciesName)
 
   # Remove "Dogfish Shark Family" so it does not get lumped with dogfish
   # data <- data[data$SPECIES != "Dogfish Shark Family", ]
@@ -67,7 +68,8 @@ summarize_rec_importance <- function(
 
   for (sp in 1:nrow(species)) {
     key <- ss <- NULL
-    name_list <- species[sp, species[sp, ] != -99]
+    cols <- as.vector(species[sp, ] != -99)
+    name_list <- species[sp, cols]
     for (a in 1:length(name_list)) {
       key = c(key, grep(species[sp, a], data$species, ignore.case = TRUE))
 
@@ -127,10 +129,10 @@ summarize_rec_importance <- function(
       Factor_Score = log(Pseudo_Revenue_Coastwide + 1) + Assessed_Last_Cycle,
       Factor_Score = dplyr::case_when(
         Factor_Score > 0 ~ Factor_Score,
-        .defualt = 0
+        .default = 0
       ),
-      Factor_Score = round(10 * Factor_Score / max(Factor_Score), 2),
-      Rank = rank(Factor_Score, ties.method = "min")
+      Factor_Score = 10 * Factor_Score / max(Factor_Score),
+      Rank = rank(-Factor_Score, ties.method = "min")
     ) |>
     dplyr::arrange(Species, .locale = "en") |>
     dplyr::rename(
@@ -167,5 +169,5 @@ summarize_rec_importance <- function(
     "data-processed/4_recreational_importance.csv",
     row.names = FALSE
   )
-  return(formatted_rec_importance)
+  return(rec_importance_df)
 }

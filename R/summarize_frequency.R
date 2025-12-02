@@ -27,18 +27,25 @@ summarize_frequency <- function(
   recreational,
   assessment_year = 2027
 ) {
-  ecosystem <- with(ecosystem, ecosystem[order(ecosystem[, "Species"]), ])
-  abunandce <- with(abunandce, abunandce[order(abunandce[, "Species"]), ])
+  ecosystem <- with(ecosystem, ecosystem[order(ecosystem$Species), ])
+  abundance <- with(abundance, abundance[order(abundance$Species), ])
 
   # Loop over files to use in scoring overall importance
-  commercial <- with(commercial, commercial[order(commercial[, "Species"]), ])
-  tribal <- with(tribal, tribal[order(tribal[, "Species"]), ])
+  commercial <- with(
+    commercial,
+    commercial[order(commercial$Species), ]
+  )
+  tribal <- with(
+    tribal,
+    tribal[order(tribal$Species), ]
+  )
   recreational <- with(
     recreational,
-    recreational[order(recreational[, "Species"]), ]
+    recreational[order(recreational$Species), ]
   )
+
   fishery_importance <- data.frame(
-    Species = abunandce$Species,
+    Species = abundance$Species,
     Rank = NA,
     Commercial = commercial$Factor_Score,
     Tribal = tribal$Factor_Score,
@@ -61,7 +68,7 @@ summarize_frequency <- function(
     Species = commercial$Species,
     Rank = NA,
     Factor_Score = NA,
-    Recruitment_Variation = abunandce$Recruit_Var,
+    Recruitment_Variation = abundance$Recruit_Var,
     Mean_Catch_Age = round(abundance$Mean_Catch_Age, 1),
     Mean_Maximum_Age = abundance$Mean_Max_Age,
     Recruitment_Adjustment = NA,
@@ -200,16 +207,9 @@ summarize_frequency <- function(
   if (max(df$Factor_Score) > 10) {
     df$Factor_Score <- round(10 * df$Factor_Score / max(df$Factor_Score), 1)
   }
+  df$Rank <- rank(-df$Factor_Score, ties.method = "min")
 
   df <- df[order(df[, "Factor_Score"], decreasing = TRUE), ]
-  x <- 1
-  for (i in sort(unique(df$Factor_Score), decreasing = TRUE)) {
-    ties <- which(df$Factor_Score == i)
-    if (length(ties) > 0) {
-      df$Rank[ties] <- x
-    }
-    x <- x + length(ties)
-  }
 
   df[is.na(df$Last_Assessment_Year), "Last_Assessment_Year"] <- "-"
   format_freq <- format_all(x = df)
@@ -217,5 +217,5 @@ summarize_frequency <- function(
     format_freq,
     here::here("data-processed", "7_assessment_frequency.csv")
   )
-  return(format_freq)
+  return(df)
 }

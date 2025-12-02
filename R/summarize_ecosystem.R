@@ -20,7 +20,7 @@ summarize_ecosystem <- function(
           max(prop_consumption_scaled + prop_consumer_bio_scaled),
         2
       ),
-      Rank = rank(Factor_Score, ties.method = "min"),
+      Rank = rank(-Factor_Score, ties.method = "min"),
       prop_consumption_scaled = round(prop_consumption_scaled, 2),
       prop_consumer_bio_scaled = round(prop_consumer_bio_scaled, 2)
     ) |>

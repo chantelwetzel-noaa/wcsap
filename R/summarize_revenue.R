@@ -116,14 +116,14 @@ summarize_revenue <- function(
       Factor_Score = log(Revenue + 1) + Assess_Last_Cycle,
       Factor_Score = dplyr::case_when(
         Factor_Score > 0 ~ Factor_Score,
-        .default = Factor_Score
+        .default = 0
       ),
       Factor_Score = dplyr::case_when(
         !is.na(Tribal_Score) ~ Factor_Score + Tribal_Score,
         .default = Factor_Score
       ),
       Factor_Score = 10 * Factor_Score / max(Factor_Score),
-      Rank = rank(Factor_Score, ties.method = "min")
+      Rank = rank(-Factor_Score, ties.method = "min")
     ) |>
     dplyr::arrange(Species, .locale = "en")
 
@@ -135,14 +135,16 @@ summarize_revenue <- function(
   if (!"TI" %in% unique(data$FLEET_CODE)) {
     revenue_df <- revenue_df |>
       dplyr::select(-Tribal_Score)
+    formatted_revenue_df <- format_all(x = revenue_df)
     utils::write.csv(
-      revenue_df,
+      formatted_revenue_df,
       "data-processed/2_commercial_revenue.csv",
       row.names = FALSE
     )
   } else {
+    formatted_revenue_df <- format_all(x = revenue_df)
     utils::write.csv(
-      revenue_df,
+      formatted_revenue_df,
       "data-processed/3_tribal_revenue.csv",
       row.names = FALSE
     )
