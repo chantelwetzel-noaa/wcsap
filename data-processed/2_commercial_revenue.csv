@@ -1,51 +1,51 @@
-"Species","Rank","Factor_Score","Assessed_Last_Cycle","Revenue","CA_Revenue","OR_Revenue","WA_Revenue","Assess_Last_Cycle"
-"Arrowtooth flounder",23,5.0164896263347,0,192.2,6.8,173.6,11.8,0
-"Aurora rockfish",14,3.49684540408275,0,38.2,19.8,17.7,0.7,0
-"Bank rockfish",27,5.46007631505014,0,306.7,301.7,4.8,0.1,0
-"Big skate",30,5.87593782271566,0,475,53.1,380.8,41.1,0
-"Black rockfish",44,7.89050766689023,0,3940.5,1097.1,2843.4,0,0
-"Blackgill rockfish",35,6.39380964660153,0,818.6,814.1,4.4,0.1,0
-"Blue/Deacon rockfish",20,4.73752947608648,0,143.2,0,143.2,0,0
-"Bocaccio",43,7.68755459494802,0,3184.5,3117.4,61.4,5.7,0
-"Cabezon",42,7.60102209084189,0,2908,1837.5,1070.4,0,0
-"California scorpionfish",19,4.65747982580721,0,131.6,131.6,0,0,0
-"Canary rockfish",41,7.42728133749232,0,2423.2,1154.7,1114.7,153.8,0
-"Chilipepper",32,6.24608450629894,0,5185.7,5109.1,76.5,0.1,-2
-"China rockfish",34,6.32681847891791,0,763,289.1,473.9,0,0
-"Copper rockfish",31,6.08316103790844,0,590.6,491,99.6,0,0
-"Cowcod",6,2.12186231862118,0,8.3,8,0.3,0,0
-"Darkblotched rockfish",33,6.31068198555668,0,750.2,131.5,583.5,35.2,0
-"Dover sole",49,9.41723708729691,0,19559.5,5501.8,13596.2,461.5,0
-"English sole",21,4.93965527818965,0,177.2,92.7,82.8,1.8,0
-"Flathead sole",8,2.56472410878724,0,13.7,0,13.7,0,0
-"Greenspotted rockfish",26,5.31160981771672,0,262.3,259.2,3.1,0,0
-"Greenstriped rockfish",13,3.42225980032768,0,35.3,16,17.3,2,0
-"Kelp greenling",36,6.56971737925879,0,984.8,171.2,813.6,0,0
-"Lingcod",47,8.7807604640898,0,10029.9,3025.3,6753.8,250.8,0
-"Longnose skate",40,7.21873513372319,0,1946.8,178.3,1693.2,75.3,0
-"Longspine thornyhead",28,5.69931158786995,0,394.5,338.5,54.5,1.4,0
-"Pacific cod",18,4.47598637398801,0,108.6,6.9,100.1,1.6,0
-"Pacific ocean perch",38,6.70402034084497,0,1134,1.4,1081.8,50.7,0
-"Pacific sanddab",29,5.74386669806886,0,413.4,332.5,80.9,0,0
-"Pacific spiny dogfish",2,0,0,0,0,0,0,0
-"Petrale sole",50,10,0,36051.9,10026.9,25385,640.1,0
-"Quillback rockfish",22,4.99114131620506,0,187.1,138.9,48.3,0,0
-"Redbanded rockfish",25,5.29225426951886,0,257,92.6,121.4,43,0
-"Redstripe rockfish",12,3.27491946822963,0,30.1,0,29.2,0.9,0
-"Rex sole",37,6.59804682488078,0,1014.5,242.2,761.2,11.2,0
-"Rosethorn rockfish",7,2.36171242411678,0,10.9,1.6,4.5,4.8,0
-"Rougheye/Blackspotted rockfish",1,-0.479278225084632,0,3.5,1.9,0.3,1.2,-2
-"Sablefish",48,8.84005814111422,0,78876.1,28325.8,37950.2,12600.1,-2
-"Sharpchin rockfish",10,3.0837184573932,0,24.4,0.3,23.9,0.3,0
-"Shortraker rockfish",11,3.09431082316724,0,24.7,0.9,15,8.9,0
-"Shortspine thornyhead",46,8.59658858102807,0,8267.3,7110.1,1089.4,67.8,0
-"Silvergray rockfish",24,5.02199480607459,0,193.3,0.5,174.8,18,0
-"Splitnose rockfish",15,3.92890355358601,0,60.7,10.2,48.6,1.9,0
-"Squarespot rockfish",5,1.86770813080222,0,6.1,6.1,0,0,0
-"Starry rockfish",17,4.40385448749411,0,100.6,100.6,0,0,0
-"Stripetail rockfish",9,2.58474515014331,0,14.1,1.8,12.3,0,0
-"Vermilion/Sunset rockfish",2,0,0,0,0,0,0,0
-"Widow rockfish",45,7.92975675228797,0,30347.1,1326.6,24894.6,4126,-2
-"Yelloweye rockfish",4,0.0515922866645831,0,6.8,0.7,2.9,3.2,-2
-"Yellowmouth rockfish",16,3.92939031905512,0,60.7,0.2,60.5,0,0
-"Yellowtail rockfish",39,6.73719797900401,0,8682.4,1019.6,5964.6,1698.3,-2
+"Species","Rank","Factor Score","Assessed Last Cycle","Revenue","CA Revenue","OR Revenue","WA Revenue","Assess Last Cycle","Management Group"
+"Petrale sole",1,10,0,36051.9,10026.9,25385,640.1,0,"species specific"
+"Dover sole",2,9.41723708729691,0,19559.5,5501.8,13596.2,461.5,0,"species specific"
+"Sablefish",3,8.84005814111422,0,78876.1,28325.8,37950.2,12600.1,-2,"species specific"
+"Lingcod",4,8.7807604640898,0,10029.9,3025.3,6753.8,250.8,0,"species specific"
+"Shortspine thornyhead",5,8.59658858102807,0,8267.3,7110.1,1089.4,67.8,0,"species specific"
+"Widow rockfish",6,7.92975675228797,0,30347.1,1326.6,24894.6,4126,-2,"species specific"
+"Black rockfish",7,7.89050766689023,0,3940.5,1097.1,2843.4,0,0,"species specific"
+"Bocaccio",8,7.68755459494802,0,3184.5,3117.4,61.4,5.7,0,"species specific"
+"Cabezon",9,7.60102209084189,0,2908,1837.5,1070.4,0,0,"other groundfish"
+"Canary rockfish",10,7.42728133749232,0,2423.2,1154.7,1114.7,153.8,0,"species specific"
+"Longnose skate",11,7.21873513372319,0,1946.8,178.3,1693.2,75.3,0,"species specific"
+"Yellowtail rockfish",12,6.73719797900401,0,8682.4,1019.6,5964.6,1698.3,-2,"species specific"
+"Pacific ocean perch",13,6.70402034084497,0,1134,1.4,1081.8,50.7,0,"species specific"
+"Rex sole",14,6.59804682488078,0,1014.5,242.2,761.2,11.2,0,"other flatfish"
+"Kelp greenling",15,6.56971737925879,0,984.8,171.2,813.6,0,0,"other groundfish"
+"Blackgill rockfish",16,6.39380964660153,0,818.6,814.1,4.4,0.1,0,"minor slope rockfish"
+"China rockfish",17,6.32681847891791,0,763,289.1,473.9,0,0,"minor nearshore rockfish"
+"Darkblotched rockfish",18,6.31068198555668,0,750.2,131.5,583.5,35.2,0,"species specific"
+"Chilipepper",19,6.24608450629894,0,5185.7,5109.1,76.5,0.1,-2,"species specific"
+"Copper rockfish",20,6.08316103790844,0,590.6,491,99.6,0,0,"minor nearshore rockfish"
+"Big skate",21,5.87593782271566,0,475,53.1,380.8,41.1,0,"species specific"
+"Pacific sanddab",22,5.74386669806886,0,413.4,332.5,80.9,0,0,"other flatfish"
+"Longspine thornyhead",23,5.69931158786995,0,394.5,338.5,54.5,1.4,0,"species specific"
+"Bank rockfish",24,5.46007631505014,0,306.7,301.7,4.8,0.1,0,"minor slope rockfish"
+"Greenspotted rockfish",25,5.31160981771672,0,262.3,259.2,3.1,0,0,"minor shelf rockfish"
+"Redbanded rockfish",26,5.29225426951886,0,257,92.6,121.4,43,0,"minor slope rockfish"
+"Silvergray rockfish",27,5.02199480607459,0,193.3,0.5,174.8,18,0,"minor shelf rockfish"
+"Arrowtooth flounder",28,5.0164896263347,0,192.2,6.8,173.6,11.8,0,"species specific"
+"Quillback rockfish",29,4.99114131620506,0,187.1,138.9,48.3,0,0,"minor nearshore rockfish"
+"English sole",30,4.93965527818965,0,177.2,92.7,82.8,1.8,0,"species specific"
+"Blue/Deacon rockfish",31,4.73752947608648,0,143.2,0,143.2,0,0,"minor nearshore rockfish"
+"California scorpionfish",32,4.65747982580721,0,131.6,131.6,0,0,0,"species specific"
+"Pacific cod",33,4.47598637398801,0,108.6,6.9,100.1,1.6,0,"species specific"
+"Starry rockfish",34,4.40385448749411,0,100.6,100.6,0,0,0,"minor shelf rockfish"
+"Yellowmouth rockfish",35,3.92939031905512,0,60.7,0.2,60.5,0,0,"minor slope rockfish"
+"Splitnose rockfish",36,3.92890355358601,0,60.7,10.2,48.6,1.9,0,"minor slope rockfish"
+"Aurora rockfish",37,3.49684540408275,0,38.2,19.8,17.7,0.7,0,"minor slope rockfish"
+"Greenstriped rockfish",38,3.42225980032768,0,35.3,16,17.3,2,0,"minor shelf rockfish"
+"Redstripe rockfish",39,3.27491946822963,0,30.1,0,29.2,0.9,0,"minor shelf rockfish"
+"Shortraker rockfish",40,3.09431082316724,0,24.7,0.9,15,8.9,0,"minor slope rockfish"
+"Sharpchin rockfish",41,3.0837184573932,0,24.4,0.3,23.9,0.3,0,"minor slope rockfish"
+"Stripetail rockfish",42,2.58474515014331,0,14.1,1.8,12.3,0,0,"minor shelf rockfish"
+"Flathead sole",43,2.56472410878724,0,13.7,0,13.7,0,0,"other flatfish"
+"Rosethorn rockfish",44,2.36171242411678,0,10.9,1.6,4.5,4.8,0,"minor shelf rockfish"
+"Cowcod",45,2.12186231862118,0,8.3,8,0.3,0,0,"minor shelf rockfish"
+"Squarespot rockfish",46,1.86770813080222,0,6.1,6.1,0,0,0,"minor shelf rockfish"
+"Yelloweye rockfish",47,0.0515922866645831,0,6.8,0.7,2.9,3.2,-2,"species specific"
+"Pacific spiny dogfish",48,0,0,0,0,0,0,0,"species specific"
+"Rougheye/Blackspotted rockfish",48,0,0,3.5,1.9,0.3,1.2,-2,"minor slope rockfish"
+"Vermilion/Sunset rockfish",48,0,0,0,0,0,0,0,"minor shelf rockfish"
