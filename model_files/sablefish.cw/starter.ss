@@ -1,10 +1,8 @@
-#C starter file written by R function SS_writestarter
-#C rerun model to get more complete formatting in starter.ss_new
-#C should work with SS version: 3.30
-#C file write time: 2023-08-10 11:39:22.549155
+#C file created using an r4ss function
+#C file write time: 2025-06-06  16:20:36
 #
-data.ss #_datfile
-control.ss #_ctlfile
+2025_sablefish_dat.ss #_datfile
+2025_sablefish_ctl.ss #_ctlfile
 0 #_init_values_src
 1 #_run_display_detail
 1 #_detailed_age_structure
@@ -14,7 +12,7 @@ control.ss #_ctlfile
 1 #_prior_like
 0 #_soft_bounds
 1 #_N_bootstraps
-24 #_last_estimation_phase
+20 #_last_estimation_phase
 1 #_MCMCburn
 1 #_MCMCthin
 0 #_jitter_fraction
@@ -23,12 +21,12 @@ control.ss #_ctlfile
 0 #_N_STD_yrs
 0.001 #_converge_criterion
 0 #_retro_yr
-4 #_min_age_summary_bio
+3 #_min_age_summary_bio
 1 #_depl_basis
 1 #_depl_denom_frac
 1 #_SPR_basis
-1 #_F_report_units
-0 #_F_report_basis
+1 #_F_std_units
+0 #_F_std_basis
 0 #_MCMC_output_detail
 0 #_ALK_tolerance
 #
