@@ -47,8 +47,13 @@ list(
   list(
     # List of species
     targets::tar_target(
+      species_file,
+      command = "data-raw/species_names.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       species,
-      readr::read_csv("data-raw/species_names.csv")
+      readr::read_csv(species_file)
     ),
     # List of species to pull survey data for:
     targets::tar_target(
@@ -58,8 +63,13 @@ list(
     # File to record the assessment year and the SSC recommendations.  This file should be updated
     # by hand each cycle:
     targets::tar_target(
+      last_assess_year_df_file,
+      command = "data-raw/assess_year_ssc_rec.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       last_assess_year_df,
-      readr::read_csv("data-raw/assess_year_ssc_rec.csv")
+      readr::read_csv(last_assess_year_df_file)
     ),
     # prev_cycle used to reach into the archived folder for last cycle output
     targets::tar_target(
@@ -87,10 +97,13 @@ list(
     # Recent harvest specifications:
     # downloaded from: https://reports.psmfc.org/pacfin/f?p=501:5301:2460998972960:::::
     targets::tar_target(
+      harvest_spex_data_file,
+      command = "data-raw/GMT015-final_specifications-2020-2024.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       harvest_spex_data,
-      readr::read_csv(
-        "data-raw/GMT015-final_specifications-2020-2024.csv"
-      )
+      readr::read_csv(harvest_spex_data_file)
     ),
     # Recent GEMM data:
     targets::tar_target(
@@ -100,46 +113,86 @@ list(
     # Future harvest specifications
     # downloaded from https://reports.psmfc.org/pacfin/f?p=501:530:2460998972960:INITIAL::::
     targets::tar_target(
+      future_spex_data_file,
+      command = "data-raw/GMT008-harvest specifications-2027-28.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       future_spex_data,
-      readr::read_csv("data-raw/GMT008-harvest specifications-2027-28.csv")
+      readr::read_csv(future_spex_data_file)
     ),
     # Revenue information downloaded from PacFIN using QueryBuilder available online:
     targets::tar_target(
+      revenue_data_file,
+      command = "data-raw/pacfin_commercial_revenue_11172025.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       revenue_data,
-      readr::read_csv("data-raw/pacfin_commercial_revenue_11172025.csv")
+      readr::read_csv(revenue_data_file)
     ),
     # Tribal importance which represents subsistence and cultural significance scoring:
     targets::tar_target(
+      tribal_score_file,
+      command = "data-raw/tribal_score.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       tribal_score_data,
-      readr::read_csv("data-raw/tribal_score.csv")
+      readr::read_csv(tribal_score_file)
     ),
     # Recreational importance by state:
     targets::tar_target(
+      recreational_importance_score_file,
+      command = "data-raw/recr_importance.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       recreational_importance_scores,
-      readr::read_csv("data-raw/recr_importance.csv")
+      readr::read_csv(recreational_importance_score_file)
     ),
     # Abundance and Assessment Frequency
     # This information is updated by summarize_stock_status() based on the most recent assessments
     targets::tar_target(
+      abundance_prev_cycle_file,
+      command = "data-processed/2024/abundance_processed_filtered.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       abundance_prev_cycle,
-      readr::read_csv("data-processed/2024/abundance_processed.csv")
+      readr::read_csv(abundance_prev_cycle_file)
     ),
     # Ecosystem top-down and bottom-up measures provided by Kristin Marshall:
     targets::tar_target(
+      ecosystem_data_file,
+      command = "data-raw/ecosystem_data.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       ecosystem_data,
-      readr::read_csv("data-raw/ecosystem_data.csv")
+      readr::read_csv(ecosystem_data_file)
     ),
     # Overfished Species: Data sheet that contains information about any overfished species
     targets::tar_target(
+      overfished_data_file,
+      command = "data-raw/overfished_species.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       overfished_data,
-      readr::read_csv("data-raw/overfished_species.csv")
+      readr::read_csv(overfished_data_file)
     ),
     # New research: spreadsheet that contains information about completed and in process research that
     # could be influential in a future assessment.
     # This spreadsheet needs to be updated by hand each cycle
     targets::tar_target(
+      new_research_file,
+      command = "data-raw/new_research.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       new_research,
-      readr::read_csv("data-raw/new_research.csv")
+      readr::read_csv(new_research_file)
     ),
     # Pull NWFSC WCGBTS data
     targets::tar_target(
@@ -156,8 +209,13 @@ list(
     #),
     # NWFSC HKL Survey Data
     targets::tar_target(
+      nwfsc_hkl_data_file,
+      command = "data-raw/nwfsc_hkl_DWarehouse_version_09032025.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       nwfsc_hkl_data,
-      readr::read_csv("data-raw/nwfsc_hkl_DWarehouse_version_09032025.csv")
+      readr::read_csv(nwfsc_hkl_data_file)
     )
   ),
 
@@ -245,8 +303,13 @@ list(
     ),
     # Update abundance based on the new assessments
     targets::tar_target(
+      abundance_updated_file,
+      command = "data-processed/abundance_processed.csv",
+      format = "file"
+    ),
+    targets::tar_target(
       abundance_updated,
-      readr::read_csv(here::here("data-processed", "abundance_processed.csv"))
+      readr::read_csv(abundance_updated_file)
     ),
     # 1 Fishing Mortality
     targets::tar_target(
@@ -274,6 +337,35 @@ list(
         species = species,
         tribal_score = tribal_score_data,
         assess_year = last_assess_year_df
+      )
+    ),
+    # 4 Recreational Importance
+    targets::tar_target(
+      recreational,
+      summarize_rec_importance(
+        rec_catch = rec_catch_filtered,
+        species = species,
+        rec_importance = recreational_importance_scores,
+        assess_year = last_assess_year_df
+      )
+    ),
+    # 5 Ecosystem
+    targets::tar_target(
+      ecosystem,
+      summarize_ecosystem(
+        ecosystem_data = ecosystem_data
+      )
+    ),
+    # 7 Assessment Frequency
+    targets::tar_target(
+      assess_frequency,
+      summarize_frequency(
+        abundance = abundance_updated,
+        ecosystem = ecosystem,
+        commercial = commercial,
+        tribal = tribal,
+        recreational = recreational,
+        assessment_year = assessment_year
       )
     )
   )
