@@ -226,5 +226,5 @@ summarize_stock_status <- function(
     new_results,
     here::here("data-processed", "model_results.csv")
   )
-  return(formatted_stock_status)
+  return(stock_status)
 }
