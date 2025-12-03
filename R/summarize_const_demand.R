@@ -33,7 +33,6 @@ summarize_const_demand <- function(
   rec_data <- rec_importance_data
   revenue_data$gear <- "TWL"
   revenue_data$gear[!revenue_data$PACFIN_GROUP_GEAR_CODE == "TWL"] <- "NTWL"
-
   rec_data <- with(rec_data, rec_data[order(rec_data[, "Species"]), ])
 
   data <- data.frame(
@@ -45,7 +44,8 @@ summarize_const_demand <- function(
     W = NA,
     TWL = NA,
     NTWL = NA
-  )
+  ) |>
+    dplyr::rename(Species = speciesName)
 
   com_importance_df <- score_rank_df <- data
 
@@ -67,13 +67,14 @@ summarize_const_demand <- function(
   # commercial and tribal revenue combined by state
   for (sp in 1:nrow(species)) {
     key <- NULL
-    name_list <- species[sp, species[sp, ] != -99]
+    cols <- as.vector(species[sp, ] != -99)
+    name_list <- species[sp, cols]
     for (a in 1:length(name_list)) {
       key = c(
         key,
         grep(
-          species[sp, a],
-          revenue_data$NOMINAL_TO_ACTUAL_PACFIN_SPECIES_NAME,
+          name_list[a],
+          revenue_data$PACFIN_SPECIES_COMMON_NAME,
           ignore.case = TRUE
         )
       )
@@ -137,6 +138,7 @@ summarize_const_demand <- function(
       3
     )
   }
+
   com_importance_df[, "Commercial_Importance_Modifier"] <- apply(
     com_importance_df[, c("C", "O", "W")] - com_importance_df[, "CW"] > 0.10,
     1,
@@ -197,16 +199,17 @@ summarize_const_demand <- function(
     Projected_ACL_Attainment = NA,
     Choke_Stock_Score = 0,
     sum_future_acl = NA
-  )
+  ) |>
+    dplyr::rename(Species = speciesName)
 
   for (sp in 1:nrow(species)) {
     ff <- NULL
-    name_list <- species[sp, species[sp, ] != -99]
-
+    cols <- as.vector(species[sp, ] != -99)
+    name_list <- species[sp, cols]
     for (a in 1:length(name_list)) {
       ff <- c(
         ff,
-        grep(species[sp, a], future_spex$STOCK_OR_COMPLEX, ignore.case = TRUE)
+        grep(name_list[a], future_spex$STOCK_OR_COMPLEX, ignore.case = TRUE)
       )
     }
     if (length(ff) == 0) {
@@ -247,9 +250,9 @@ summarize_const_demand <- function(
       Recreational_Importance_Modifier = rec_importance_df$Recreational_Importance_Modifier,
       Factor_Score = Choke_Stock_Score +
         Commercial_Importance_Modifier +
-        Recreation_Importance_Modifier,
+        Recreational_Importance_Modifier,
       Factor_Score = 10 * Factor_Score / max(Factor_Score),
-      Rank = rank(Factor_Score, ties.method = "min")
+      Rank = rank(-Factor_Score, ties.method = "min")
     ) |>
     dplyr::arrange(Species, .locale = "en")
 
@@ -266,5 +269,5 @@ summarize_const_demand <- function(
     com_importance_df,
     here::here("data-processed", "_constituent_demand_com_importance.csv")
   )
-  return(format_const_importance)
+  return(const_importance)
 }
