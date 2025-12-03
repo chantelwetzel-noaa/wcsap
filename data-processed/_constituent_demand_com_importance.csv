@@ -1,0 +1,51 @@
+Species,Commercial_Importance_Modifier,CW,C,O,W,TWL,NTWL
+Arrowtooth flounder,2,0.367,0.224,0.596,0.513,0.63,0.166
+Aurora rockfish,2,0.224,0.347,0.277,0.308,0.37,0.292
+Bank rockfish,2,0.49,0.633,0.149,0.231,0.543,0.542
+Big skate,2,0.551,0.388,0.66,0.667,0.696,0.396
+Black rockfish,0,0.837,0.776,0.872,0.128,0.108,0.937
+Blackgill rockfish,0,0.653,0.735,0.106,0.154,0.522,0.729
+Blue/Deacon rockfish,0,0.633,0.714,0.638,0,0.021,0.77
+Bocaccio,1,0.796,0.878,0.426,0.487,0.826,0.854
+Cabezon,0,0.776,0.837,0.766,0,0,0.896
+California scorpionfish,1,0.306,0.49,0,0,0.152,0.52
+Canary rockfish,1,0.755,0.796,0.829,0.846,0.804,0.792
+Chilipepper,1,0.918,0.98,0.574,0.179,0.913,0.874
+China rockfish,0,0.612,0.612,0.681,0,0,0.75
+Copper rockfish,1,0.571,0.694,0.489,0,0.131,0.708
+Cowcod,1,0.02,0.265,0.021,0,0.218,0
+Darkblotched rockfish,1,0.592,0.469,0.703,0.641,0.717,0.438
+Dover sole,0,0.939,0.918,0.937,0.872,0.956,0.229
+English sole,2,0.327,0.429,0.468,0.359,0.586,0.25
+Flathead sole,1,0.061,0,0.212,0,0.283,0
+Greenspotted rockfish,1,0.449,0.592,0.085,0.051,0.26,0.687
+Greenstriped rockfish,3,0.204,0.306,0.255,0.41,0.347,0.354
+Kelp greenling,0,0.673,0.531,0.745,0.026,0,0.812
+Lingcod,1,0.898,0.857,0.915,0.897,0.869,0.958
+Longnose skate,1,0.735,0.551,0.851,0.769,0.848,0.458
+Longspine thornyhead,2,0.51,0.673,0.383,0.436,0.565,0.646
+Pacific cod,2,0.408,0.245,0.511,0.821,0.652,0.208
+Pacific ocean perch,0,0.714,0.143,0.788,0.692,0.761,0.124
+Pacific sanddab,2,0.531,0.653,0.447,0,0.674,0.583
+Pacific spiny dogfish,2,0.102,0.327,0.043,0.282,0.044,0.312
+Petrale sole,0,0.98,0.959,0.979,0.949,1,0.5
+Quillback rockfish,1,0.347,0.51,0.34,0.205,0.065,0.604
+Redbanded rockfish,1,0.469,0.429,0.532,0.718,0.413,0.687
+Redstripe rockfish,2,0.184,0.02,0.319,0.333,0.435,0.02
+Rex sole,0,0.694,0.571,0.723,0.615,0.739,0.062
+Rosethorn rockfish,3,0.041,0.163,0.128,0.462,0.239,0.146
+Rougheye/Blackspotted rockfish,3,0.429,0.367,0.554,0.744,0.499,0.562
+Sablefish,1,1,1,1,1,0.935,1
+Sharpchin rockfish,2,0.143,0.061,0.298,0.256,0.391,0.084
+Shortraker rockfish,2,0.163,0.122,0.234,0.538,0.326,0.27
+Shortspine thornyhead,0,0.857,0.939,0.809,0.795,0.782,0.979
+Silvergray rockfish,2,0.388,0.082,0.617,0.59,0.609,0.374
+Splitnose rockfish,2,0.245,0.286,0.362,0.385,0.478,0.104
+Squarespot rockfish,1,0,0.204,0,0,0,0.188
+Starry rockfish,1,0.286,0.449,0,0,0.087,0.479
+Stripetail rockfish,2,0.082,0.184,0.192,0.077,0.304,0.042
+Vermilion/Sunset rockfish,0,0.816,0.898,0.171,0,0.195,0.916
+Widow rockfish,0,0.959,0.816,0.958,0.974,0.978,0.624
+Yelloweye rockfish,1,0.122,0.102,0.063,0.564,0.174,0.334
+Yellowmouth rockfish,2,0.265,0.041,0.404,0.103,0.457,0.416
+Yellowtail rockfish,1,0.878,0.755,0.894,0.923,0.891,0.833
