@@ -11,7 +11,7 @@ library(targets)
 
 # Use the following commands to remove one or all files when getting errors
 # targets::tar_delete("rank")
-# targets::tar_destroy("all)
+# targets::tar_destroy("all")
 
 # Set target-specific options such as packages:
 targets::tar_option_set(
@@ -366,6 +366,53 @@ list(
         tribal = tribal,
         recreational = recreational,
         assessment_year = assessment_year
+      )
+    ),
+    # 8 Constituent Demand
+    targets::tar_target(
+      constituent_demand,
+      summarize_const_demand(
+        revenue_data = revenue_data_filtered,
+        rec_importance_data = recreational,
+        fishing_mortality = fishing_mortality,
+        future_spex = future_spex_data,
+        species = species
+      )
+    ),
+    # 9 New Information
+    targets::tar_target(
+      new_info,
+      summarize_new_information(
+        species = species,
+        survey_data = new_survey_data,
+        assess_year = last_assess_year_df,
+        new_research = new_research
+      )
+    ),
+    # 10 Rebuilding
+    targets::tar_target(
+      rebuilding,
+      summarize_rebuilding(
+        species = species,
+        overfished_data = overfished_data,
+        stock_status = stock_status,
+        assessment_year = assessment_year
+      )
+    ),
+    # Calculate the overall ranks
+    targets::tar_target(
+      rank,
+      calculate_rank(
+        fishing_mortality = fishing_mortality,
+        commercial_importance = commercial,
+        tribal_importance = tribal,
+        recreational_importance = recreational,
+        ecosystem = ecosystem,
+        stock_status = stock_status,
+        assessment_frequency = assess_frequency,
+        constituent_demand = constituent_demand,
+        new_information = new_info,
+        rebuilding = rebuilding
       )
     )
   )
