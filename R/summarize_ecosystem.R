@@ -43,5 +43,5 @@ summarize_ecosystem <- function(
     formatted_ecosystem,
     here::here("data-processed", "5_ecosystem.csv")
   )
-  return(formatted_ecosystem)
+  return(modified_ecosystem)
 }

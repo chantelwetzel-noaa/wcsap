@@ -130,5 +130,5 @@ summarize_fishing_mortality <- function(
     formatted_mort_df,
     here::here("data-processed", "1_fishing_mortality.csv")
   )
-  return(fish_mort)
+  return(mort_df)
 }
