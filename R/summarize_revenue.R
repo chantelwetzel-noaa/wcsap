@@ -41,7 +41,6 @@ summarize_revenue <- function(
     Rank = NA,
     Factor_Score = NA,
     Tribal_Score = NA,
-    Assessed_Last_Cycle = 0,
     Revenue = NA,
     CA_Revenue = NA,
     OR_Revenue = NA,
@@ -62,7 +61,7 @@ summarize_revenue <- function(
       key <- c(
         key,
         grep(
-          species[sp, a],
+          name_list[a],
           data$PACFIN_SPECIES_COMMON_NAME,
           ignore.case = TRUE
         )

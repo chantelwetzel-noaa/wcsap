@@ -28,23 +28,24 @@ summarize_new_information <- function(
     Issues_Can_be_Addressed = 0,
     Survey_Abundance = 0,
     Survey_Composition = 0
-  )
+  ) |>
+    dplyr::rename(Species = speciesName)
 
   for (sp in 1:nrow(species)) {
     key <- ss <- ff <- NULL
-    name_list <- species[sp, species[sp, ] != -99]
-
+    cols <- as.vector(species[sp, ] != -99)
+    name_list <- species[sp, cols]
     for (a in 1:length(name_list)) {
       # Survey data
       key <- c(
         key,
-        grep(species[sp, a], survey_data$Common_name, ignore.case = TRUE)
+        grep(name_list[a], survey_data$Common_name, ignore.case = TRUE)
       )
 
       # New Research/Issues
       ff <- c(
         ff,
-        grep(species[sp, a], new_research$Species, ignore.case = TRUE)
+        grep(name_list[a], new_research$Species, ignore.case = TRUE)
       )
     }
 
@@ -93,7 +94,8 @@ summarize_new_information <- function(
           survey_data[key, "total_lengths"] +
             survey_data[key, "total_ages"] +
             survey_data[key, "total_otoliths"] <
-            10000,
+            10000 ~
+          1,
         .default = 0
       )
     }
@@ -106,7 +108,7 @@ summarize_new_information <- function(
     # Assign a value of +5
   }
 
-  new_info_df <- new_info_ff |>
+  new_info_df <- new_info_df |>
     dplyr::mutate(
       Factor_Score = New_Research +
         Issues_Can_be_Addressed +
@@ -123,5 +125,5 @@ summarize_new_information <- function(
     formatted_new_info,
     here::here("data-processed", "9_new_information.csv")
   )
-  return(formatted_new_info)
+  return(new_info_df)
 }

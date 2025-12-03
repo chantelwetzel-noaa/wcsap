@@ -23,28 +23,32 @@ summarize_rebuilding <- function(
     Rank = NA,
     Factor_Score = 0,
     Rebuilding_Target_Year = NA
-  )
+  ) |>
+    dplyr::rename(Species = speciesName)
 
-  for (a in 1:nrow(overfished_data)) {
-    find <- grep(
-      overfished_data[a, "Species"],
-      overfished_df[, "Species", ],
-      ignore.case = TRUE
-    )
-    target <- overfished_data[a, "Ttarget"]
-    score_based_on_time <- dplyr::case_when(
-      target - assessment_year > 20 ~ 4,
-      target - assessment_year <= 20 & target - assessment_year > 4 ~ 6,
-      .default = 9
-    )
+  if (nrow(overfished_data) > 1 & overfished_data[, "Species"] != "none") {
+    for (a in 1:nrow(overfished_data)) {
+      find <- grep(
+        overfished_data[a, "Species"],
+        overfished_df[, "Species", ],
+        ignore.case = TRUE
+      )
+      target <- overfished_data[a, "Ttarget"]
+      score_based_on_time <- dplyr::case_when(
+        target - assessment_year > 20 ~ 4,
+        target - assessment_year <= 20 & target - assessment_year > 4 ~ 6,
+        .default = 9
+      )
 
-    score <- dplyr::case_when(
-      stock_status[find, "Trend"] == -1 ~ 10,
-      .default = score_based_on_time
-    )
-    overfished_df[find, "Factor_Score"] <- score
-    overfished_df[find, "Rebuilding_Target_Year"] <- target
+      score <- dplyr::case_when(
+        stock_status[find, "Trend"] == -1 ~ 10,
+        .default = score_based_on_time
+      )
+      overfished_df[find, "Factor_Score"] <- score
+      overfished_df[find, "Rebuilding_Target_Year"] <- target
+    }
   }
+
   overfished_df <- overfished_df |>
     dplyr::mutate(
       Rank = rank(-Factor_Score, ties.method = "min")
@@ -55,5 +59,5 @@ summarize_rebuilding <- function(
     formatted_overfished,
     here::here("data-processed", "10_rebuilding.csv")
   )
-  return(formatted_overfished)
+  return(overfished_df)
 }

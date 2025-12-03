@@ -71,9 +71,8 @@ summarize_rec_importance <- function(
     cols <- as.vector(species[sp, ] != -99)
     name_list <- species[sp, cols]
     for (a in 1:length(name_list)) {
-      key = c(key, grep(species[sp, a], data$species, ignore.case = TRUE))
-
-      ss <- c(ss, grep(species[sp, a], rec_score$Species, ignore.case = TRUE))
+      key = c(key, grep(name_list[a], data$species, ignore.case = TRUE))
+      ss <- c(ss, grep(name_list[a], rec_score$Species, ignore.case = TRUE))
     }
 
     rec_importance_df[
