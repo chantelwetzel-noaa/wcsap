@@ -40,7 +40,6 @@ calculate_rank <- function(
 
   overall_rank <- data.frame(
     Species = fishing_mortality$Species,
-    Overall_Rank = NA,
     Total_Score = NA,
     fishing_mortality = fishing_mortality$Factor_Score,
     commercial_importance = commercial_importance$Factor_Score,
@@ -53,8 +52,6 @@ calculate_rank <- function(
     new_information = new_information$Factor_Score,
     rebuilding = rebuilding$Factor_Score
   )
-
-  overall_rank_rm_stock_status_rebuild <- overall_rank
 
   overall_rank <- overall_rank |>
     dplyr::mutate(
@@ -72,41 +69,15 @@ calculate_rank <- function(
           rebuilding * 0.10,
         2
       ),
-      Rank = rank(Total_Score, ties.method = "min")
+      Rank = rank(-Total_Score, ties.method = "min")
     ) |>
     dplyr::arrange(dplyr::desc(Total_Score)) |>
-    dplyr::arrange(Species, .locale = "en")
-
-  # Calculate rank with stock status and rebuilding removed
-  overall_rank_rm_stock_status_rebuild <- overall_rank_rm_stock_status_rebuild |>
-    dplyr::mutate(
-      Total_Score = round(
-        fishing_mortality *
-          0.08 +
-          commercial_importance * 0.21 +
-          tribal_importance * 0.05 +
-          recreational_importance * 0.09 +
-          ecosystem * 0.05 +
-          stock_status * 0.0 +
-          assessment_frequency * 0.18 +
-          constituent_demand * 0.11 +
-          new_information * 0.05 +
-          rebuilding * 0.0,
-        2
-      ),
-      Rank = rank(Total_Score, ties.method = "min")
-    ) |>
-    dplyr::arrange(dplyr::desc(Total_Score)) |>
+    dplyr::relocate(Rank, .before = Total_Score) |>
     dplyr::arrange(Species, .locale = "en")
 
   utils::write.csv(
     overall_rank,
     "data-processed/11_overall_rank.csv",
-    row.names = FALSE
-  )
-  utils::write.csv(
-    overall_rank_rm_stock_status_rebuild,
-    "data-processed/11_overall_rank_rm_stock_status_rebuilding.csv",
     row.names = FALSE
   )
   return(overall_rank)
