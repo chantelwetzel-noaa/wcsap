@@ -107,7 +107,7 @@ list(
     ),
     # Recent GEMM data:
     targets::tar_target(
-      gemm_mortality_data,
+      gemm_mortality_data_raw,
       nwfscSurvey::pull_gemm(years = recent_5_years)
     ),
     # Future harvest specifications
@@ -225,6 +225,7 @@ list(
     #  clean_files,
     #  clean_model_files()
     #),
+    # Filter and format GEMM data
     # Apply year filters
     targets::tar_target(
       harvest_spex_filtered,
@@ -241,9 +242,15 @@ list(
       )
     ),
     targets::tar_target(
+      gemm_mortality_filtered,
+      filter_area_gemm(
+        data = gemm_mortality_data_raw
+      )
+    ),
+    targets::tar_target(
       rec_catch_filtered,
       filter_gemm(
-        data = gemm_mortality_data
+        data = gemm_mortality_data_raw
       )
     ),
     # Commercial or Tribal Revenue Data Filter
@@ -315,7 +322,7 @@ list(
     targets::tar_target(
       fishing_mortality,
       summarize_fishing_mortality(
-        gemm_mortality = gemm_mortality_data,
+        gemm_mortality = gemm_mortality_filtered,
         harvest_spex = harvest_spex_filtered,
         species = species
       )
