@@ -55,7 +55,8 @@ summarize_fishing_mortality <- function(
     Average_OFL_Attainment = NA,
     Average_ACL = NA,
     Average_ACL_Attainment = NA
-  )
+  ) |>
+    dplyr::rename(Species = speciesName)
 
   for (sp in 1:nrow(species)) {
     key <- ss <- ff <- NULL
@@ -63,7 +64,7 @@ summarize_fishing_mortality <- function(
     name_list <- species[sp, cols]
 
     for (a in 1:length(name_list)) {
-      key <- c(key, grep(species[sp, a], data$species, ignore.case = TRUE))
+      key <- c(key, grep(name_list[, a], data$species, ignore.case = TRUE))
       ss <- c(
         ss,
         grep(name_list[a], spex$STOCK_OR_COMPLEX, ignore.case = TRUE)
@@ -95,6 +96,7 @@ summarize_fishing_mortality <- function(
 
       # Need to use sum rather than mean due to OFLs and ACLs under different names (e.g. Gopher and Black and Yellow)
       value <- apply(temp_spex[, 2:3], 2, sum, na.rm = TRUE)
+
       mort_df$Average_OFL[sp] <- value[manage_quants[1]] /
         length(unique(temp_spex$SPEX_YEAR))
       mort_df$Average_ACL[sp] <- value[manage_quants[2]] /
@@ -103,7 +105,6 @@ summarize_fishing_mortality <- function(
   }
 
   mort_df <- mort_df |>
-    dplyr::rename(Species = speciesName) |>
     dplyr::mutate(
       Average_OFL_Attainment = round(Average_Catches / Average_OFL, 2),
       Average_ACL_Attainment = round(Average_Catches / Average_ACL, 2),
